@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learner's License Download</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/neocotic/qrious@4.0.2/dist/qrious.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    
+    <style>
+        .license {
+            display: flex;
+            justify-content: center;
+        }
+
+        .frontView, .backView {
+            background-color: transparent;
+            width: 350px;
+            height: 200px;
+            color: black;
+            margin: 10px;
+            box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 2px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
+            rgba(0, 0, 0, 0.2) 0px -1px 0px inset;
+            background-color: #fff;
+        }
+
+       
+
+        .frontView .heading {
+            font-size: 20px;
+            position: absolute;
+            padding-top: 3px;
+            padding-left: 15px;
+            text-decoration: underline;
+        }
+
+        .frontView .heading_8264 {
+            position: absolute;
+            letter-spacing: .2em;
+            font-weight: 600;
+            padding-top: 35px;
+            padding-left: 140px;
+            font-size: 11px;
+        }
+
+        .frontView .logo {
+            position: absolute;
+            margin-top: 35px;
+            margin-left: 10px;
+        }
+
+        .frontView .number {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1em;
+            margin-top: 80px;
+            margin-left: 15px;
+        }
+
+        .frontView .name {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1em;
+            margin-top: 103px;
+            margin-left: 15px;
+        }
+
+        .frontView .valid_thru {
+            position: absolute;
+            font-weight: bold;
+            margin-top: 145px;
+            font-size: 0.6em;
+            margin-left: 15px;
+        }
+
+        .frontView .to {
+            position: absolute;
+            font-weight: bold;
+            margin-top: 160px;
+            font-size: 0.6em;
+            margin-left: 15px;
+        }
+
+        .frontView .group {
+            position: absolute;
+            font-weight: bold;
+            margin-top: 130px;
+            font-size: .6em;
+            margin-left: 15px;
+        }
+
+        .frontView .pic {
+            border: 1px solid white;
+            border-radius: 5px;
+            position: absolute;
+            margin-top: 70px;
+            margin-left: 220px;
+        }
+
+        .backView .classOfVehicle {
+            position: absolute;
+            font-weight: 600;
+            font-size: 15px;
+            margin-top: 8px;
+            margin-left: 15px;
+        }
+
+        .backView .dateOfBirth {
+            position: absolute;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-top: 29px;
+            margin-left: 15px;
+        }
+
+        .backView .gender {
+            position: absolute;
+            font-weight: 600;
+            font-size: 15px;
+            margin-top: 50px;
+            margin-left: 15px;
+        }
+
+        .backView .phone {
+            position: absolute;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-top: 70px;
+            margin-left: 15px;
+        }
+
+        .backView .address {
+            position: absolute;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-top: 90px;
+            margin-left: 15px;
+        }
+
+        .backView .street {
+            position: absolute;
+            font-weight: 600;
+            font-size: 0.6em;
+            margin-top: 110px;
+            margin-left: 15px;
+        }
+
+        .backView .city {
+            position: absolute;
+            font-weight: 600;
+            font-size: 0.6em;
+            margin-top: 125px;
+            margin-left: 15px;
+        }
+
+        .backView .state {
+            position: absolute;
+            font-weight: 600;
+            font-size: 0.6em;
+            margin-top: 140px;
+            margin-left: 15px;
+        }
+
+        .backView .postalCode {
+            position: absolute;
+            font-weight: 600;
+            font-size: 0.6em;
+            margin-top: 155px;
+            margin-left: 15px;
+        }
+
+        .backView .signature {
+            position: absolute;
+            margin-top: 150px;
+            margin-left: 225px;
+        }
+        .backView .qrCode{
+            position: absolute;
+            margin-top: 60px;
+            margin-left: 240px;
+            width: 80px;
+            height: 80px;           
+        }
+        
+        @media print{
+            .no-print{
+                display: none;
+            }
+        }
+
+        #btnDownload{
+            background-color: #149ECA;
+            color: white;
+            width: 150px;
+        }
+        
+    </style>
+</head>
+<body style="background-color: #19374C;">
+    <div class="license" id="licenseContent">
+        <div class="frontView">
+            <p class="heading">DEPARTMENT OF DRIVING LICENSE</p>
+                    <p class="heading_8264">DRIVING LICENSE CARD</p>
+                    <img class="logo" src="/client/public/icons/icons8-driving-license-64.png" alt="" width="46" height="50">
+                    <p class="number" id="DLNumber"></p>
+                    <p class="name" id="fullName"></p>
+                    <p class="valid_thru">VALID FROM: <span id="DLCreatedDate"></span></p>
+                    <span class="to">TO: <span id="DLexpiryDate"></span></span>
+                    <p class="group">Blood Group: <span id="bloodGroup"></span></p>
+                    <img class="pic" id="DLimage" src="" alt="" height="100px" width="100px">
+        </div>
+
+
+        <div class="backView">
+            <p class="classOfVehicle">CLASS OF VEHICLE: <span id="classOfVehicle"></span></p>
+                    <p class="dateOfBirth">DATE OF BIRTH: <span id="dateOfBirth"></span></p>
+                    <p class="gender">GENDER: <span id="gender"></span></p>
+                    <p class="phone">PHONE NO.: <span id="phone"></span></p>
+                    <p class="address">ADDRESS: </p>
+                    <p class="street">STREET: <span id="street"></span></p>
+                    <p class="city">CITY: <span id="city"></span></p>
+                    <p class="state">STATE: <span id="state"></span></p>
+                    <p class="postalCode">POSTAL CODE: <span id="postalCode"></span></p>
+                    <img class="signature" id="signature" src="" alt="" style="height: 30px; width: 100px;">
+                    <canvas class="qrCode" id="qrCode"> </canvas>
+        </div>
+    </div>
+
+    <button id="btnDownload" class="no-print form-control">DOWNLOAD</button>
+
+
+
+
+
+
+
+
+
+
+    <script>
+        let aadharNumber;
+        $(document).ready(function(){
+            if ($.cookie("aadhar_number") === undefined) {
+                location.href = "index.html";
+            } else {
+                aadharNumber = $.cookie("aadhar_number");
+
+                $('#btnDownload').on('click', function () {
+                    window.print();
+                })
+                    
+      ;$.when(
+            $.ajax({
+                method: 'get',
+                url: 'http://127.0.0.1:4000/aadharDetails',
+            }),
+            $.ajax({
+                method: 'get',
+                url: 'http://127.0.0.1:4000/DLDetails',
+            }),
+            $.ajax({
+                method: 'get',
+                url: 'http://127.0.0.1:4000/llFormData',
+            }),
+            $.ajax({
+                method: 'get',
+                url: 'http://127.0.0.1:4000/DLrenewDetails',
+            })
+        ).then(function (aadharData, DLDetails, formData, DLrenewData) {
+            const data = aadharData[0].find(entry => entry.aadharNumber === aadharNumber);
+            const DLData = DLDetails[0].find(entry => entry.aadharNumber === aadharNumber);
+            const formDatas = formData[0].find(entry => entry.aadharNumber === aadharNumber);
+            const renewData = DLrenewData[0].find(entry => entry.aadharNumber === aadharNumber);
+
+            // Update your HTML elements and generate the QR code
+            if (data && DLData && formDatas && renewData) {
+                $("#street").text(data.address.street);
+                $("#city").text(data.address.city);
+                $("#state").text(data.address.state);
+                $("#postalCode").text(data.address.postalCode);
+
+                $("#DLNumber").text(DLData.DLNumber);
+                $("#DLCreatedDate").text(renewData.DLrenewDate);
+                $("#DLexpiryDate").text(renewData.DLexpiryDate);
+
+                const classOfVehicle = formDatas.classOfVehicle.join(', ');
+                $("#fullName").text(formDatas.fullName);
+                $("#bloodGroup").text(formDatas.bloodGroup);
+                $("#classOfVehicle").text(classOfVehicle);
+                $("#gender").text(formDatas.gender);
+                $("#dateOfBirth").text(formDatas.dateOfBirth);
+                $("#phone").text(formDatas.phone);
+
+                generateQRCode(data, DLData, formDatas,renewData);
+                
+
+            }
+        }).fail(function () {
+            console.log("Failed to fetch data.");
+        });
+                $.ajax({
+                    method: 'get',
+                    url: 'http://127.0.0.1:4000/uploads',
+                    success: function(uploadedFiles){
+                        const files = uploadedFiles.find(entry => entry.aadharNumber === aadharNumber);
+                        if(files){
+                            const imgSrc = `data:image/png;base64,${files.signature}`;
+                            $('#signature').attr('src',imgSrc);
+                        }
+                    }
+                })
+                $.ajax({
+                    method: 'get',
+                    url: 'http://127.0.0.1:4000/DLCapturedPhoto',
+                    success: function(uploadedFiles){
+                        const captures = uploadedFiles.find(entry => entry.aadharNumber === aadharNumber);
+                        if(captures){
+                            const imgSrc = `data:image/png;base64,${captures.image}`;
+                            $("#DLimage").attr('src',imgSrc)
+                        }
+                    }
+                });
+
+
+                function generateQRCode(data,DLData, formDatas){
+                    const userDetails = {
+                        aadharNumber: data.aadharNumber,
+                        fullName : data.fullName,
+                        bloodGroup : formDatas.bloodGroup,
+                        gender : data.gender,
+                        dateOfBirth : data.dateOfBirth,
+                        phone : data.phone,
+                        address : $('#address').text(),
+                        city : data.address.city,
+                        state : data.address.state,
+                        postalCode: data.address.postalCode,
+                        DLNumber: DLData.DLNumber
+                    }
+                    const qr = new QRious({
+                        element: document.getElementById("qrCode"), // required
+                        value: JSON.stringify(userDetails),
+                        size: 395,
+                    })
+                }
+
+            }
+
+
+            
+            
+        });   
+      </script>
+</body>
+</html>

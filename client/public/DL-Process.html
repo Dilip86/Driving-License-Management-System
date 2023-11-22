@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DL Processing Page</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script src="https://kit.fontawesome.com/9e082aa5ef.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../src/DL-Process.css">
+</head>
+<body style="background-color: #19374C; color: #F6F7F9;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>User's Name- <span id="fullName" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="title" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>    
+
+    <div class="main-content">
+    <p>Here First take the Driving skill Test of User.</p>
+
+    <ol class="questions">
+        <li>
+            <label for="question1">Did the user properly activate the left turn indicator when turning left?</label>
+            <input type="checkbox" class="form-check-input" id="question1-yes" name="question1" value="Yes">
+            Yes
+            
+        </li>
+        <li>
+            <label for="question2">Did the user maintain the appropriate speed as indicated by traffic signs and posters?</label>
+            <input type="checkbox" class="form-check-input" id="question2-yes" name="question2" value="Yes">
+            Yes
+            
+        </li>
+        <li>
+            <label for="question3">Did the user use the brakes in the correct location (e.g., at bumpers)?</label>
+            <input type="checkbox" class="form-check-input" id="question3-yes" name="question3" value="Yes">
+            Yes
+            
+        </li>
+        <li>
+            <label for="question4">Did the user use their vehicle's horn appropriately?</label>
+            <input type="checkbox" class="form-check-input" id="question4-yes" name="question4" value="Yes">
+            Yes
+            
+        </li>
+        <li>
+            <label for="question5">Was the user attentive to traffic rules and signals?</label>
+            <input type="checkbox" class="form-check-input" id="question5-yes" name="question5" value="Yes">
+            Yes
+            
+        </li>
+        <li>
+            <label for="question6">Did the user maintain a safe following distance from other vehicles?</label>
+            <input type="checkbox" class="form-check-input" id="question6-yes" name="question6" value="Yes">
+            Yes
+            
+        </li>
+        <li>
+            <label for="question7">Did the user make proper use of rearview mirrors?</label>
+            <input type="checkbox" class="form-check-input" id="question7-yes" name="question7" value="Yes">
+            Yes
+            
+        </li>
+        <li>
+            <label for="question8">Did the user observe right of way rules and give way when required?</label>
+            <input type="checkbox" class="form-check-input" id="question8-yes" name="question8" value="Yes">
+            
+        </li>
+        <li>
+            <label for="question9">Was the user courteous and patient towards other road users?</label>
+            <input type="checkbox" class="form-check-input" id="question9-yes" name="question9" value="Yes">
+            
+        </li>
+        <li>
+            <label for="question10">Did the user maintain proper lane discipline?</label>
+            <input type="checkbox" class="form-check-input" id="question10-yes" name="question10" value="Yes">
+            
+        </li>
+    </ol>
+
+    <p id="resultMessage"></p>
+    <button class="form-control" id="checkResults">Check Results</button>
+    <div id="notificationBox" class="notification-box">
+        <div id="notificationMessage" class="notification-message">
+            <!--side popup will display here-->
+        </div>
+    </div>
+    
+
+    <p>if driving skill test passed then continue for photo process else come back again after one month with practising bike driving</p>
+    <div id="photoProcess">
+        <div id="photoUpload">
+            <p>Now here camera will open when you click on open camera, take photo and click on submit</p>
+            <label>Upload Photo</label><br>
+            <button class="form-control" id="openCamera">Open Camera</button>
+            <div class="photo" style="display: none;">
+            <div class="video-wrap">
+                <video id="video" playsinline autoplay></video>
+                <button class="form-control" id="capture"><i class="fa-solid fa-camera fa-beat"></i> Capture Photo</button>
+            </div>
+            </div>
+
+            <div class="controller">
+                <button class="form-control" id="retake">Retake Photo</button>
+            </div>
+
+            <canvas id="canvas" width="250" height="300"></canvas>
+
+            <button class="form-control" id="btnSave">Save</button>
+            <span id="ErrorMsg"></span>
+
+
+        </div>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <p class="success">Captured Photo saved in database successfully.</p>
+            <button class="form-control" id="okButton">Ok</button>
+        </div>
+    </div>
+
+    <p>If all done then click on done button to denerate DL number, created date, expiry date of that specifc user</p>
+    <button class="form-control" id="btnDone">Done</button>
+    <p>DL Number: <span id="DLNumber"></span></p>
+    <p>DL Created Date: <span id="DLCreatedDate"></span></p>
+    <p>DL Expiry date: <span id="DLexpiryDate"></span></p>
+</div>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+        <script>
+            window.addEventListener("load", function () {
+                setTimeout(function () {
+                document.querySelector(".preloader").style.display = "none";
+                document.body.style.display = "block";
+                }, 300); // 2000 milliseconds = 2 seconds
+            });
+        let aadharNumber;
+        let mediaStream;
+         $(document).ready(function() {
+            const aadharNumberElement = $("#aadharNumber");
+            const resultMessage = $("#resultMessage");
+
+            const aadharNumber = sessionStorage.getItem("aadharNumber");
+            if (aadharNumber) {
+                aadharNumberElement.text(aadharNumber);
+            }
+
+            $("#btnLogout").click(()=>{
+                window.location.href = "admin-dashboard.html";
+            })
+
+            $("#openCamera").click(()=>{
+                $(".photo").css("display","block")
+            })
+
+            $("#capture").click(()=>{
+                $(".photo").css("display","none")
+            })
+            $("#retake").click(()=>{
+                $(".photo").css("display","block")
+            });
+
+            $("#okButton").click(()=>{
+                $("#popup").css("display","none");
+            })
+
+            $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/aadharDetails",
+                success: function(data){
+                    const aadharData = data.find(entry => entry.aadharNumber === aadharNumber);
+                    if(aadharData){
+                        $('#fullName').text(aadharData.fullName);
+                        $('#title').text(aadharData.aadharNumber)
+                    }
+                }
+            });
+
+            function showNotification(message){
+                const notificationBox = document.getElementById('notificationBox');
+                const notificationMessage = document.getElementById('notificationMessage');
+                notificationMessage.innerHTML = message;
+                notificationBox.style.display = 'block';
+                setTimeout(function() {
+                    notificationBox.style.display = 'none';
+                }, 5000);
+            }
+
+            $("#checkResults").click(function() {
+                // Initialize a variable to check if all questions are passed
+                let allQuestionsPassed = true;
+
+                // Check each question
+                for (let i = 1; i <= 10; i++) {
+                    const yesCheckbox = $(`#question${i}-yes`);
+                    const noCheckbox = $(`#question${i}-no`);
+
+                    if (!(yesCheckbox.is(":checked") && !noCheckbox.is(":checked"))) {
+                        allQuestionsPassed = false;
+                        break;
+                    }
+                }
+
+                // Display the result message
+                if (allQuestionsPassed) {
+                    resultMessage.text("Driving skill test passed. You may continue for the photo process.");
+                    $(".questions").css("display","none")
+                } else {
+                    resultMessage.text("Driving skill test failed. Please come back again after one month with practicing bike driving.");
+                    const aadharNumberInSession = sessionStorage.getItem("aadharNumber");
+
+                    $.ajax({
+                        method: "get",
+                        url: "http://127.0.0.1:4000/aadharDetails",
+                        success: function(data){
+                             data.forEach(user => {
+                                const fullName = user.fullName;
+                                const userEmail = user.email;
+                                const aadharNumber = user.aadharNumber;
+                                if (aadharNumber === aadharNumberInSession){
+                                sendDrivingSkillFailedNotification(userEmail, fullName, aadharNumber);
+                                }
+                            });
+                            
+                        },
+                        error: function(){
+                            console.log('error');
+                            }
+                    })
+                    
+                }
+            });
+
+                function sendDrivingSkillFailedNotification(userEmail, fullName, aadharNumber){
+                    Email.send({
+                        SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3", 
+                        To: userEmail,
+                        From: 'ssati753@gmail.com',
+                        Subject: "Sorry! You have not cleared Driving skill test.",
+                        Body: `Dear ${fullName},
+                            Your Aadhar number is ${aadharNumber}.
+                            You haven't cleared your driving skill test. Please practice more for driving.
+                            Come back after one month with improved driving skills. You can book the slot again and visit our office.
+                            Thank you.
+                            `,
+                    }).then(function(message){
+                        showNotification("An email sent to user regarding driving skill test fail.")
+                    });
+                }
+
+                function dataURLtoBlob(dataURL) {
+                    const parts = dataURL.split(';base64,');
+                    const contentType = parts[0].split(':')[1];
+                    const raw = atob(parts[1]);
+                    const rawLength = raw.length;
+                    const uint8Array = new Uint8Array(rawLength);
+                    for (let i = 0; i < rawLength; ++i) {
+                        uint8Array[i] = raw.charCodeAt(i);
+                    }
+                    return new Blob([uint8Array], { type: contentType });
+                }
+
+                const openCamera = $('#openCamera');
+                const video = $('#video');
+                const canvas = $('#canvas');
+                const capture = $('#capture');
+                const retake = $('#retake');
+                const btnSave = $('#btnSave');
+                const errorMsgElement = $('#ErrorMsg');
+                const capturedImage = $('#capturedImage');
+                
+                let capturedPhotoUrl = null;
+
+
+                const constraints = {
+                    video: {
+                        width: 250, height: 300
+                    }
+                };
+
+                async function init() {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        handleSuccess(stream);
+                    } catch (e) {
+                        errorMsgElement.html(`navigator.getUserMedia.error:${e.toString()}`);
+                    }
+                }
+
+                function handleSuccess(stream) {
+                    window.stream = stream;
+                    video.prop('srcObject', stream);
+                    $('.video-wrap').css('display', 'block');
+                    $('.controller').css('display', 'block');
+                }
+
+                openCamera.on('click', function () {
+                    init();
+                });
+
+                var context = canvas[0].getContext('2d');
+
+                function clearCanvas() {
+                    context.clearRect(0, 0, canvas[0].width, canvas[0].height);
+                }
+
+                capture.on('click', function () {
+                    context.drawImage(video[0], 0, 0, 250, 300);
+                    capturedPhotoUrl = canvas[0].toDataURL('image/png');
+                });
+
+                retake.on('click', function () {
+                    clearCanvas();
+                    capturedPhotoUrl = null;
+                    capturedImage.attr('src', '');
+                });
+
+                btnSave.on('click', function () {
+                    // const aadharNumber = $("#photoUploadAadharNumber").val();
+
+                if (capturedPhotoUrl) {
+                    console.log('Captured Photo URL:', capturedPhotoUrl);
+
+                    capturedImage.attr('src', capturedPhotoUrl);
+
+                    // Convert Data URL to Blob
+                    const blob = dataURLtoBlob(capturedPhotoUrl);
+
+                    // Prepare the data for upload
+                    const data = new FormData();
+                    data.append('image', blob, 'image.png');
+                    data.append('aadharNumber', aadharNumber);
+
+                    $.ajax({
+                        method: 'POST',
+                        url: 'http://127.0.0.1:4000/DLCapturedPhoto', // Change this URL to your server endpoint
+                        data: data,
+                        contentType: false, // Ensure this is set to false for FormData
+                        processData: false, // Ensure this is set to false for FormData
+                        success: function (response) {
+                            // alert(response.message);
+                            $("#popup").css("display", "block")
+                            $("#photoProcess").css("display","none");
+                            stopMediaStream();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error uploading image: ' + JSON.stringify(error));
+                        }
+                    });
+                }
+            });
+            function stopMediaStream() {
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(function (track) {
+                        track.stop();
+                    });
+                }
+            }
+
+            //function for generatig a unique DL number like DL1234567890
+            function generateDLNumber() {
+                const currentYear = new Date().getFullYear();
+                const randomDigits = Math.floor(Math.random() * 1000000000); 
+                return `DL${currentYear}${randomDigits}`;
+            }
+
+            const DLNumber = generateDLNumber();
+
+            //function for generating todays date dd/mm/yyyy
+            function getTodaysDate() {
+                const today = new Date();
+                const day = today.getDate();
+                const month = today.getMonth() + 1; 
+                const year = today.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+
+            const DLCreatedDate = getTodaysDate();
+
+            //fucntion for generatig expiry date of 15 years
+            function generateExpiryDate() {
+                const today = new Date();
+                today.setFullYear(today.getFullYear() + 15); // Add 15 years
+                const day = today.getDate();
+                const month = today.getMonth() + 1; 
+                const year = today.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+
+            const DLexpiryDate = generateExpiryDate();
+
+            $("#btnDone").click(()=>{
+                let userEmail;
+                let fullName;
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/aadharDetails",
+                    success: function(data){
+                        const aadharData = data.find(user => user.aadharNumber === aadharNumber);
+                        if (aadharData) {
+                userEmail = aadharData.email;
+                fullName = aadharData.fullName;
+                            } else{
+                                console.log('Aadhar data not found');
+                return;
+                            }
+                        
+
+                     
+                const DLData = {
+                    aadharNumber: aadharNumber,
+                    DLNumber: DLNumber,
+                    DLCreatedDate: DLCreatedDate,
+                    DLexpiryDate: DLexpiryDate,
+                };
+                $.ajax({
+                    method: "post",
+                    url: "http://127.0.0.1:4000/DLDetails",
+                    data: DLData,
+                    success: function () {
+                        // alert("data saving to database Success");
+                        $("#DLNumber").text(DLNumber);
+                        $("#DLCreatedDate").text(DLCreatedDate);
+                        $("#DLexpiryDate").text(DLexpiryDate);
+                        $("#popup").css("display","block");
+                        $(".success").text("DL details saved in database successfully.");
+                        sendDLDetailsNotification(userEmail, fullName, aadharNumber, DLNumber, DLCreatedDate, DLexpiryDate);
+                        },
+                        error: function (err) {
+                            console.log(err)
+                            }
+                })
+                    },
+                    error: function (err) {
+                        console.log(err)
+                        }
+                        });
+                        });
+
+            function sendDLDetailsNotification(userEmail, fullName, aadharNumber, DLNumber, DLCreatedDate, DLexpiryDate){
+                Email.send({
+                    SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3", 
+                    To: userEmail,
+                    From: 'ssati753@gmail.com',
+                    Subject: "Congratulations! You have cleared all Driving Skill test",
+                    Body: `Dear ${fullName},
+                        You have clerared all Driving Skill Test.
+                        Your Aadhar number is ${aadharNumber}.
+                        Your Driving License card Number is <strong>${DLNumber}</strong>.
+                        And your Driving License is created at ${DLCreatedDate}.
+                        Your Driving license expiry date is ${DLexpiryDate}.
+                        
+                        You can download your Driving License from index page.
+                        Thank you.
+                        Regards,
+                        Team`,
+                }).then(function(message){
+                    showNotification("Message sent to user regarding DL process.")
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DL Application Main</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/neocotic/qrious@4.0.2/dist/qrious.min.js"></script>
+    <link rel="stylesheet" href="../src/DL-application.css">
+</head>
+<body style="background-color: #19374C; color: #F6F7F9;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="fullName" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="title" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+    
+    <div class="main-content">
+    <h2>DL application</h2> 
+    <p>Now here are some steps to get DL </p>
+    <p>
+    <ol>
+        <li> Book a slot for Driving Test in physical. <br> And there department will take a photo of you for re-verification. <br>
+        By evaluation of Driving Test. You wil get mail regarding Test.</li>
+        <li> Pay the fee for DL.</li>
+        <li> If test passed and verification done you can download your Driving License Card in index page.</li>
+    </ol>
+    </p>
+    <div id="slotBooking">
+        <h2>Book a slot</h2>
+        <div class="d-flex">
+            <div class="me-5">
+                <dd>Pick a Slot Date</dd>
+                <input type="date" class="form-control" id="slotDate" required>
+            </div>
+            <div>
+                <dd>Pick a Slot Time</dd>
+                <select class="form-control" id="slotTime" required>
+                    <option value="" selected disabled hidden>Select time</option>
+                </select>
+            </div>
+            <div>
+                <button class="form-control ms-5 mt-xl-4" id="dateSubmit">Submit</button>
+            </div>
+        </div> 
+    </div>
+    <p class="mt-3">If you want to see the fee structure, click <span id="fee">fee details</span></p>
+    <div id="feeDetails">
+        <div class="feeDetails-content">
+        <h1><span class="bi bi-newspaper"></span> Calculation of fee<span class="bi bi-x-circle-fill"></span></h1>
+        </div>
+        <ul>
+        <li>For each class of vehicle, the fee is 100/-. If you have selected two, then it will be 200/-. Vice versa for more.</li>
+        <li>For DL , the cost is 800/-</li>
+        <li>If you have selected one class of vehicle, then the total fee will be</li>
+        <li>1 class of vehicle = 100/-</li>
+        <li>For DL = 800</li>
+        <li>Total fee = 900/-</li>
+        </ul>
+    </div>
+    <div id="DLFee">
+        <div id="container">
+            
+            <p>Click on "Continue" to find out how much you have to pay.</p>
+            <button class="form-control" id="getDetails">Continue</button>
+            <div class="feedetailsTable" style="display: none;">
+            <table class="table table-bordered table-hover table-primary w-25 mt-3">
+                <thead>
+                    <th>Fee Details</th>
+                    <th>Calculation</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Class Of vehicle</th>
+                        <!-- dynamic value comes from the server -->
+                        <td id="classOfVehicle">Fetching...</td>
+                    </tr>
+                    <tr>
+                        <th>Fee for class</th>
+                        <!-- dynamic value comes from the server -->
+                        <td id="feeForClass"></td>
+                    </tr>
+                    <tr>
+                        <th>Fee for DL</th>
+                        <td>800/-</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Total fee (including 18% GST):</th>
+                        <td id="totalFee">Fetching..</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+            <h2>Selected Class of Vehicle</h2>
+            <ul id="selectedClassOfVehicle"></ul>
+        </div>
+        <div id="paymentMsg">
+            <p>Now you have completed all steps. Just initiate the payment. After careful evaluation, you will receive an email from us for the next steps.</p>
+        </div>
+    
+        <div id="paymentForm" style="display: none;">
+            <label for="paymentAmount">Payment Amount (INR):</label>
+            <!-- Display the user's total fee as the default payment amount and disable the input -->
+            <div class="d-flex">
+            <input type="number" class="form-control" id="paymentAmount" min="1" step="0.01" disabled>
+            <button class="form-control" id="initiatePayment">Initiate Payment</button>
+        </div>
+        </div>
+        <div id="DLFeeReferenceNumber" style="display: none;">
+            <p>DL Payment Reference Number: <span id="refNumber"></span></p>
+        </div>
+    </div>
+
+    <div id="qrMsg" style="display: none;">
+        <div id="qrEnvelope">
+            <canvas id="qrcode"></canvas>
+        </div>
+        <p>Scan this QR code and submit the form. Tank you.</p>
+        <p>After scanning and filling the form pease click on log out button <button class="form-control" id="Logoutbtn">Log out</button></p>
+    </div>
+</div>
+<div class="popup" id="popup">
+    <div class="popup-content">
+        <p class="success">Slot Booked Successfully...</p>
+        <button id="okButton">Ok</button>
+    </div>
+</div>
+
+<div class="payment-popup" id="paymentPopup" style="display: none;">
+    <div class="payment-popup-content">
+        <p class="success">Fees data has been stored in the database for reference.</p>
+        <button id="paymentOkButton">Ok</button>
+    </div>
+</div>
+
+
+<div id="notificationBox" class="notification-box">
+    <div id="notificationMessage" class="notification-message">
+        <!--side popup will display here-->
+    </div>
+</div>
+
+
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+            document.querySelector(".preloader").style.display = "none";
+            document.body.style.display = "block";
+            }, 300); // 2000 milliseconds = 2 seconds
+        });
+
+        var fullName;
+        let aadharNumber;
+        let toEmail;
+        $(document).ready(function(){
+            if ($.cookie("aadhar_number") === undefined) {
+                location.href = "index.html";
+            } else {
+                aadharNumber = $.cookie('aadhar_number');
+            }
+            $("#btnLogout").click(() => {
+                $.removeCookie('aadhar_number');
+                window.location.href = "index.html";
+            });
+
+            $("#Logoutbtn").click(() => {
+                $.removeCookie('aadhar_number');
+                window.location.href = "index.html";
+            });
+
+            $("#okButton").click(()=>{
+                $("#slotBooking").css("display","none");
+                $("#DLFee").css("display","block");
+                $("#popup").css("display","none");
+            });
+
+            $("#fee").click(()=>{
+                $("#feeDetails").css("display","block");
+            });
+
+            $(".bi-x-circle-fill").click(()=>{
+                $("#feeDetails").css("display","none");
+            });
+            $("#getDetails").click(()=>{
+                $(".feedetailsTable").show();
+            });
+            $("#paymentOkButton").click(()=>{
+                $(".payment-popup").css("display", "none");
+            })
+
+            var fullName = $("#fullName").val();
+            $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/aadharDetails",
+                success: function(data){
+                    const aadharData = data.find(entry => entry.aadharNumber === aadharNumber);
+                    if(aadharData){
+                        fullName = aadharData.fullName;
+                        $('#fullName').text(fullName);
+                        $('#title').text(aadharData.aadharNumber)
+                        toEmail = aadharData.email;
+                    }
+                }
+            });
+
+            //generate a dl reference number for slot verification.
+            function generateSLotDLReferenceNumber(){
+                //12 digit number
+                return Math.floor(100000000000 + Math.random() * 900000000000);
+            }
+
+            function sendSlotNotification(toEmail, fullName, DLSlotReferenceNumber, aadharNumber, slotDate, slotTime) {
+                Email.send({
+                    SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3", // Replace with your secure token
+                    To: toEmail,
+                    From: 'ssati753@gmail.com', // Update with your email address
+                    Subject: "Congratulations! You have Booked your slot Successfully.",
+                    Body: `Congratulations! Dear ${fullName}. Your slot for DL test and other process is booked.
+                        Your credentials for the slot are below:
+                        Aadhar Number: ${aadharNumber},
+                        DL Reference Number: <strong>${DLSlotReferenceNumber}</strong>,
+                        Slot Date: ${slotDate},
+                        Slot Time: ${slotTime}.
+                        Please proceed to the nearest RTO office on the date you have booked your slot.
+                        Please carry your Aadhar Number.
+                        Thank you.
+                        Regards,`,
+                }).then(function (message){
+                    // alert("Sent");
+                    showNotification("An Email sent to your mail id");
+                });
+            }   
+            
+            function showNotification(message){
+                const notificationBox = document.getElementById('notificationBox');
+                const notificationMessage = document.getElementById('notificationMessage');
+                notificationMessage.innerHTML = message;
+                notificationBox.style.display = 'block';
+                setTimeout(function() {
+                    notificationBox.style.display = 'none';
+                }, 5000);
+            }
+
+            $("#slotDate").on("change", function() {
+                const selectedDate = $(this).val();
+                // You can adjust this logic to populate the time slots based on the selected date.
+                // For this example, we'll add some dummy time slots.
+                const timeSlots = ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"];
+                const slotTimeSelect = $("#slotTime");
+                slotTimeSelect.empty(); // Clear previous options
+                timeSlots.forEach((timeSlot) => {
+                    slotTimeSelect.append($("<option>", {
+                        value: timeSlot,
+                        text: timeSlot,
+                    }));
+                });
+            });
+
+            
+
+            
+            //book a slot
+            $("#dateSubmit").on("click", ()=>{
+                const selectedDate = $("#slotDate").val();
+                const selectedTime = $("#slotTime").val();
+                if (!selectedDate || !selectedTime) {
+                    alert('Please select a date and time.');
+                    return;
+                }
+
+                const today = new Date();
+                const maxDate = new Date(today);
+                maxDate.setMonth(maxDate.getMonth() + 1); // One month in the future
+
+                const selectedDateObj = new Date(selectedDate);
+
+                if (selectedDateObj < today || selectedDateObj > maxDate) {
+                    alert('Please select a date within the allowed range.');
+                } else {
+                    console.log("Selected Date: " + selectedDate);
+                    const DLSlotReferenceNumber = generateSLotDLReferenceNumber();
+                    // You can proceed with your AJAX request here
+                    const dlData={
+                        aadharNumber: aadharNumber,
+                        slotDate: selectedDate,
+                        slotTime: selectedTime,
+                        fullName : fullName,
+                        DLSlotReferenceNumber : generateSLotDLReferenceNumber(),
+                    }
+                    $.ajax({
+                        method: "post",
+                        url: "http://127.0.0.1:4000/DLSlotBookings",
+                        data: dlData,
+                        success: function(response){
+                            // console.log(response);
+                            sendSlotNotification(toEmail, fullName, DLSlotReferenceNumber, aadharNumber, selectedDate, selectedTime);
+                            // alert('Slot Booked Successfully!');
+                            // $("slotBooking").css("display","none");
+                            // $("DLFee").css("display","block");
+                            $("#popup").css("display","block");
+                        },
+                        error: function(err){
+                            console.error(err);
+                            alert('Error Occurred while booking Slot. Please try again later.')
+                            }
+                    });
+                }
+            });
+
+            
+
+            
+           
+
+            //to get payment details to pay
+            $('#getDetails').on('click', function () {
+                $.ajax({
+                    method: 'get',
+                    url: 'http://127.0.0.1:4000/llFormData',
+                    success: (LLFormData) => {
+                        user = LLFormData.find(userData => userData.aadharNumber === aadharNumber);
+                        if (user) {
+                            classOfVehicle = user.classOfVehicle || [];
+                            $("#classOfVehicle").text(user.classOfVehicle.join(', '));
+                            const feeForClass = classOfVehicle.length * 100;
+                            $("#feeForClass").text(`${feeForClass}/-`);
+
+                            const gstPercentage = 18;
+                            const gstAmount = (feeForClass + 800) * (gstPercentage / 100);
+                            const totalFee = feeForClass + 800 + gstAmount;
+
+                            $("#totalFee").text(`INR ${totalFee.toFixed(2)}`);
+
+                            const selectedClassOfVehicleList = $("#selectedClassOfVehicle");
+                            selectedClassOfVehicleList.empty();
+                            user.classOfVehicle.forEach(vehicle => {
+                                const listItem = $("<li>").text(vehicle);
+                                selectedClassOfVehicleList.append(listItem);
+                            });
+                            $("#paymentForm").show();
+
+                            $("#paymentAmount").val(totalFee.toFixed(2));
+
+                            
+                        }
+                    },
+                    error: () => {
+                        alert("An error occurred while fetching data.");
+                    }
+                });
+            });
+            
+            //Payment for Driving License Fee
+            $("#initiatePayment").click(()=>{
+                var paymentAmount = parseFloat($("#paymentAmount").val());
+                if (isNaN(paymentAmount) || paymentAmount <= 0) {
+                    alert("Invalid payment amount.");
+                    return;
+                }
+                 var DLFeeReferenceNumber = generateDLFeeUniqueReferenceNumber();
+                 var DLreferenceNumber = generateDLreferenceNumber();
+
+                function generateDLreferenceNumber(){
+                    return Math.floor(1000000000000000 + Math.random() * 9000000000000000);
+                }
+
+                 function generateDLFeeUniqueReferenceNumber() {
+                     return Math.random().toString(36).substr(2, 9);
+                 }
+
+                 $("#refNumber").text(DLFeeReferenceNumber);
+                 $("#DLFeeReferenceNumber").show();
+
+               var googleFormLink = "https://docs.google.com/forms/d/e/1FAIpQLScV7xLD4Azi-I0yuyZCg1csU72wsJP6vQjtykui8zvIQ7vVIw/viewform?usp=sf_link";
+
+                 var qr = new QRious({
+                    element: document.getElementById('qrcode'),
+                 value: googleFormLink,
+                    size: 200
+               });
+
+                 var DLPaymentData = {
+                     aadharNumber: aadharNumber,
+                     amountPaid: paymentAmount,
+                     DLFeeReferenceId: DLFeeReferenceNumber,
+                     transactionDate: Date.now(),
+                     DLreferenceNumber: DLreferenceNumber
+                 };
+
+                 function sendMailPaymentReferenceNumber(toEmail, fullName, DLFeeReferenceNumber, DLreferenceNumber){
+                    Email.send({
+                         SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3",
+                         To: toEmail,
+                         From: "ssati753@gmail.com",
+                         Subject: "DL Payment Details, Reference Number",
+                         Body: `Dear User,${fullName}<br/>Congrats you have done your payment successfully.<br/>
+                         Your Payment Reference number is <strong>${DLFeeReferenceNumber}</strong>, And your DL Reference Number <strong>${DLreferenceNumber}</strong>. Please use this for any further assistance or queries.
+                         Thank you team DL`,
+                   }).then(function (message){
+                        //  alert("Email sent: " + message);
+                        showNotification("An email has sent to your id regarding payment.")
+                    });
+
+               }
+                 $.ajax({
+                     method: "post",
+                     url: "http://127.0.0.1:4000/DLpaymentData",
+                     data: DLPaymentData,
+                     success: function () {
+                        // alert("Fees data has been stored in the database for reference");
+                        $(".payment-popup").css("display","block");
+                        $("#qrMsg").show();
+                         $("#qrEnvelope").css("animation", "revealEnvelope 1s ease-in-out forwards");
+                         sendMailPaymentReferenceNumber(toEmail, fullName, DLFeeReferenceNumber, DLreferenceNumber);
+                     },
+                     error: function(){
+                      alert("Error while storing fees data");
+                     }
+                 })
+            })
+
+        });
+    </script>
+</body>
+</html>

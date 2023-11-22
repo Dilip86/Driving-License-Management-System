@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main LL and DL Page</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="../src/main.css">
+</head>
+<body style="background-color: #19374C; color: white;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="fullName" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="aadharNumber" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div><span class="ll" id="btnLL">LL</span></div>
+        <div><span class="dl" id="btnDL">DL</span></div>
+    </div>
+
+    <div class="d-flex justify-content-around">
+        <div class="llPart" style="display: none; color: #F6F7F9;">
+            <h3>Learner's License Section</h3>
+            <p>If you are a new user then continue to LL application page below.</p>
+            <button id="btnApplication" class="form-control w-25 applicationbtn">LL Application Page</button>
+
+            <p class="mt-3">If you have already registered and came for do
+            updates then select which section you want to update.</p>
+                <div class="d-flex justify-content-around">
+            <button id="btnUpdateLLform">Update LL</button>
+            <button id="btnUpdateSign">Update Signature</button>
+            <button id="btnUpdatePhoto">Update Photo</button>
+        </div>
+
+            <div id="examLogin" class="mt-3">
+                <p>If you have completed all sections of LL form, Uploadings, Payment then you can log in to exam section.</p>
+                <label for="referenceNumber">Enter your LL Reference Number</label>
+                <div class="d-flex">
+                <input type="text" class="form-control" name="referenceNumber" id="LLreferenceNumber" placeholder="Reference number" required>
+                <button class="form-control w-25" id="btnContinue">Continue</button>
+            </div>
+            <div class="popup" id="popup">
+                <div class="popup-content">
+                    <p class="success">You entered LLreference Number is Ok and you are redirecting to the quiz Page.Thank You</p>
+                    <button id="okButton">Ok</button>
+                </div>
+            </div>
+            </div>
+
+            <div id="license" class="d-flex mt-5">
+                <span>If you want to download the Learner's License please continue here </span> <button id="btnLicense" class="form-control">Continue</button>
+            </div>
+
+            <div id="LLrenew" class="mt-3">
+                <p>If your LL is expiredand wants to renew your LL please enter your LL Unique Id</p>
+                <label for="LLuniqueIdInput">Enter LL uniqueLLId</label>
+                <div class="d-flex">
+                <input type="text" class="form-control w-25" placeholder="LL Unique ID" name="" id="LLuniqueIdInput">
+                <button class="form-control w-25 ms-3" id="continueLLRenew">Continue</button>
+                </div>
+                <span id="LLrenewError"></span>
+            </div>
+
+            <div>
+                <p>To download the New LL then enter the LL Renew Reference Number</p>
+                <input type="text" class="form-control w-25" placeholder="Enter LL Renew Ref No." id="LLrenewReferenceNumber">
+                <label for="LLrenewReferenceNumber">Enter LL reference number</label>
+                <button id="llrenewDownload" class="form-control w-25">Continue</button>
+            </div>
+            
+        </div>
+        <div class="dlPart" style="display: none;">
+            <h3>Driving License Section</h3>
+            <p style="color: rgb(246, 184, 69);">If you are a new user then go to application page and continue with your LL process.</p>
+            <p>If you completed one month of Learner's License then you continue with your DL process.</p>
+            <p>To continue with DL process. Please enter your uniqueLLId</p>
+            <label>Enter your uniqueLLID: </label>
+            <input type="text" class="form-control w-25" id="uniqueLLId" placeholder="Enter Unique Id" required>
+            <span style="color: green; font-weight: 500;">Ex: LL1234567890</span><br>
+            <span id="errMsg" style="color: rgb(224, 8, 8); font-weight: 400;"></span><br>
+            <button id="btnDlApply" class="form-control">Go To DL Apply Page</button>
+            <br>
+            <br>
+            <div id="DLDownload">
+                <label>Enter Your DL Reference Number for download DL</label>
+                <input type="text" class="form-control" id="DLreferenceNumber" placeholder="Enter your DL Reference Number">
+                <button id="dlRefNoSubmit" class="form-control mt-2">Submit</button>
+                <p id="invalidDLref" style="color: red;"></p>
+                
+            </div>
+
+            <div id="DLRenewal">
+            <p>If your DL is expired please Renewal Here</p>
+            <label>Enter your DL Number</label>
+            <input type="text" class="form-control w-25" id="DLnumber" required placeholder="Enter your DL Number">
+            <span id="expiryMsg"></span>
+            <button id="renewBtn" class="form-control mt-2">Renew Now</button>
+        </div>
+
+        <div>
+            <p>To download the new DL please enter your DL renew Payment Reference Number</p>
+            <input type="text" class="form-control w-25" placeholder="Enter LL Renew Ref No." id="DLrenewReferenceNumber">
+            <label for="DLrenewReferenceNumber">Enter LL reference number</label>
+            <button id="DLrenewDownload" class="form-control w-25">Continue</button>
+        </div>
+
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+            document.querySelector(".preloader").style.display = "none";
+            document.body.style.display = "block";
+            }, 300); // 2000 milliseconds = 2 seconds
+        });
+      
+        $(document).ready(function(){
+            let aadharNumber = $.cookie("aadhar_number");
+
+            if (aadharNumber === undefined) {
+                location.href = "index.html";
+            };
+            $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/aadhardetails",
+                success: function (data) {
+                    const user = data.find((userData) => userData.aadharNumber === aadharNumber);
+
+                    if (user) {
+                        // Display full name and Aadhar number on the page
+                        $("#fullName").text(user.fullName);
+                        $("#aadharNumber").text(user.aadharNumber);
+                    } else {
+                        alert("User data not found.");
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while fetching user data.");
+                }
+            });
+
+        
+
+            $("#btnLL").click(()=>{
+                $(".llPart").css("display", "block");
+                $(".dlPart").css("display", "none");
+                // $("#btnDL").css("display", "none");
+                $(".main-content").css("display", "none");
+            });
+            $("#btnDL").click(()=>{
+                $(".dlPart").css("display", "block");
+                $(".llPart").css("display", "none");
+                // $("#btnLL").css("display", "none");
+                $(".main-content").css("display", "none");
+            })
+
+            $(".logoutBtn").click(()=>{
+                $.removeCookie('aadhar_number');
+                window.location.href = "index.html"
+            })
+
+            $("#btnApplication").click(()=>{
+                location.href = "LL-application.html"
+            })
+            
+            $("#btnUpdateLLform").click(()=>{
+                location.href = "update-LL.html"
+            })
+
+            $("#btnUpdateSign").click(()=>{
+                location.href = "update-sign.html"
+            })
+
+            $("#btnUpdatePhoto").click(()=>{
+                location.href = "update-photo.html"
+            })
+            $("#btnLicense").click(()=>{
+                location.href = "license.html"
+            });
+            $("#okButton").click(()=>{
+                window.location.href = "exam.html";
+            });
+
+            $("#btnContinue").click(()=>{
+                // location.href = "exam.html"
+                var referenceNumber = $("#LLreferenceNumber").val();
+
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/llFormData",
+                    success: (LLData)=>{
+                        const matchingLL = LLData.find(ll => ll.LLreferenceNumber === referenceNumber);
+
+                        if(matchingLL){
+                            // location.href= "exam.html";
+                            // alert("You entered LLreference Number is Ok and you are redirecting to the quiz Page.Thank You")
+                            $("#popup").css("display","block");
+                        }
+                        else{
+                            alert("You entered LL reference Number is wrong please try again");
+                        }
+                    },
+                    error: ()=>{
+                        console.log('error');
+                        }
+                })
+            });
+
+            
+
+            $("#btnDlApply").click(()=>{
+                var uniqueLLId = $("#uniqueLLId").val();
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/examStatus",
+                    success: (data)=>{
+                        const llData = data.find(item => item.aadharNumber === aadharNumber && item.uniqueLLID === uniqueLLId);
+
+                        if (llData){
+                            const formattedDate = new Date(llData.formattedDate);
+                            const currentDate = new Date();
+                            const timeDifference = currentDate - formattedDate;
+                            const oneMonthInMillis = 30 * 24 * 60 * 60 * 1000;
+
+                            if (timeDifference >= oneMonthInMillis) {
+                                location.href = "DL-application.html"; 
+                            } else {
+                                const remainingDays = Math.ceil((oneMonthInMillis - timeDifference) / (24 * 60 * 60 * 1000));
+                                $("#errMsg").text("Your LL is not completed one month. "  + remainingDays + "days remaining.");
+                            }
+                        } else {
+                            $("#errMsg").text("No LL data found for this uniqueLLId.");
+                        }
+                    },
+                    error: ()=>{
+                        console.log('error');
+                        }
+                })
+            })
+
+            $("#dlRefNoSubmit").click(()=>{
+                let dlReferenceNumber = $("#DLreferenceNumber").val();
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/DLpaymentData",
+                    success: (data)=>{
+                        const paymentData = data.find(entry => entry.aadharNumber === aadharNumber && entry.DLreferenceNumber === dlReferenceNumber)
+                        if(paymentData){
+                            window.location.href = "DLlicense.html"
+                        } else {
+                            $("#invalidDLref").text("Invalid DL Reference Number. Please try again.");
+                            $("#invalidDLref").show();
+                        }
+                    },
+                    error: () => {
+                        console.log('error');
+                    }
+                    });
+            });
+
+            $("#continueLLRenew").click(() => {
+                let llnumber = $("#LLuniqueIdInput").val();
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/examStatus",
+                    success: (data) => {
+                        let lldata = data.find(entry => entry.aadharNumber === aadharNumber && entry.uniqueLLID === llnumber);
+                        if (lldata) {
+                            let currentDate = new Date();
+                            let expiryDate = new Date(lldata.expiryDate);
+
+                            if (currentDate > expiryDate) {
+                                // LL is expired, navigate to llrenew.html
+                                location.href = "llrenew.html";
+                            } else {
+                                // Calculate remaining days
+                                let timeDifference = expiryDate - currentDate;
+                                let remainingDays = Math.ceil(timeDifference / (24 * 60 * 60 * 1000));
+                                $("#LLrenewError").text(`Your LL is not expired yet. ${remainingDays} days remaining.`);
+                            }
+                        }
+                    }
+                });
+            });
+
+            $("#renewBtn").click(()=>{
+                let dlNumber = $("#DLnumber").val();
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/DLDetails",
+                    success: (data)=>{
+                        let dlData = data.find(entry => entry.aadharNumber === aadharNumber && entry.DLNumber === dlNumber)
+                        if(dlData){
+                            let createdDate = new Date(dlData.DLCreatedDate);
+                            let currentDate = new Date();
+                            let expiryDate = new Date(dlData.DLexpiryDate);
+
+                            if (createdDate > expiryDate){
+                                alert("Your DL is expired. Please renew it.");
+                                location.href = "dlrenew.html";
+                            } else {
+                                let timeDifference = expiryDate - currentDate;
+
+                                let years = Math.floor(timeDifference / (365 * 24 * 60 *60 * 1000));
+                                let remainingDays = Math.floor((timeDifference % (365 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
+                                let remainingMonths = Math.floor(remainingDays / 30);
+                                remainingDays %= 30;
+                                $("#expiryMsg").text(`Your DL is valid for: ${years} years, ${remainingMonths} months, and ${remainingDays} days.`);
+                            } 
+                        } else {
+                            $("#expiryMsg").text("DL not found. Please check your DL Number.");
+                        }
+                    },
+                    error: () => {
+                        console.log('error');
+                        }
+                })
+            });
+
+            $("#llrenewDownload").click(()=>{
+                const LLrenewReferenceNumber = $("#LLrenewReferenceNumber").val();
+
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/LLrenewDetails",
+                    success: function(data){
+                        const renewData = data.find(entry => entry.aadharNumber === aadharNumber && entry.renewReferenceNUmber === LLrenewReferenceNumber)
+                        if(renewData){
+                            window.location.href = "LLrenewLicense.html"
+                        }
+                    }
+                })
+            })
+
+            $("#DLrenewDownload").click(()=>{
+                const DLrenewReferenceNumber = $("#DLrenewReferenceNumber").val();
+
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/DLrenewDetails",
+                    success: function(data){
+                        const renewData = data.find(entry => entry.aadharNumber === aadharNumber && entry.renewReferenceNUmber === DLrenewReferenceNumber)
+                        if(renewData){
+                            window.location.href = "dlrenewlicense.html"
+                        }
+                    }
+                })
+            })
+
+
+
+
+        });
+    </script>
+</body>
+</html>

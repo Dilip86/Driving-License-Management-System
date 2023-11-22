@@ -1,0 +1,335 @@
+body{
+    background-color: #19374C;
+    color: white;
+}
+
+.head_nav{
+    text-align: center;
+    background-color: #333A45;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+
+.body {
+    display: none;
+  }
+  .preloader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Transparent background */
+    z-index: 1000; /* Ensures it's on top of everything */
+  }
+
+  .preloader img {
+    max-height: 200px;
+    max-width: 200px;
+  }
+
+  .preloader div {
+    font-size: 25px;
+    color: white;
+  }
+  label{
+    color: #9A9DA1;
+  }
+
+#btnAdminSignin{
+    font-size: 20px;
+    background-color: #0D6D8C;
+    color: #FFFFFF;
+    border: 1px solid #149ECA;
+    border-radius: 5px;
+    width: 100px;
+  }
+  
+  #btnLogin,#btnCheckEligible,#btnHomepage,#btnRegister,#btnReset,#verifyOTP{
+    font-size: 20px;
+    background-color: #0D6D8C;
+    color: #FFFFFF;
+    border: 1px solid #149ECA;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+
+  #btnHomepage,#btnRegister,#verifyOTP{
+    width: 140px;
+  }
+
+  
+  #btnCheckEligible,#btnReset{
+    width: 180px;
+    padding-top: 10px;
+  }
+  .img1{
+    height: 500px;
+    width: 500px;
+  }
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1A1D24;
+    color: #9A9DA1;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.popup-content p{
+    text-align: center;
+}
+
+#closePopup {
+    color: #0D6D8C;
+    cursor: pointer;
+    float: right;
+    font-size: 20px;
+}
+
+
+  
+
+.head_nav h1 {
+    font-size: 36px;
+    color: #E6E8EC;
+    text-shadow: 0 0 5px #fff;
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    animation: shine 2s linear infinite, move 4s ease infinite;
+}
+
+
+.head_nav p{
+    font-size: 15px;
+    text-align: right;
+    color: #149ECA;
+    margin-right: 290px;
+}
+
+.kyc{
+    font-size: 15px;
+    text-decoration: underline;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+
+@keyframes shine {
+    0% {
+        text-shadow: 0 0 5px #fff;
+    }
+    50% {
+        text-shadow: 0 0 20px #f9ff2a;
+    }
+    100% {
+        text-shadow: 0 0 5px #fff;
+    }
+}
+
+@keyframes move {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(10px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.bi-person-fill{
+    font-size: 35px;
+}
+
+.adminlogo{
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    color: #149ECA;
+    cursor: pointer;
+    display: flex;
+}
+
+
+
+.admin-popup {
+    top: 100px;
+    left: 550px;
+    display: none;
+    background-color: #23272F;
+    align-items: center;
+    height: auto;
+    width: 500px;
+    border: 3px solid transparent;
+    border-radius: 20px;
+    position: absolute;
+    padding: 20px;
+    box-sizing: border-box;
+    justify-content: center;
+    animation: borderMove 2s linear infinite;
+    z-index: 1001;
+}
+
+
+.bi-x-circle{
+    color: #149ECA;
+    font-size: 25px;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    cursor: pointer;
+}
+
+@keyframes borderMove {
+    0% {
+        border-color: #149ECA; /* Starting with constant color */
+    }
+    50% {
+        border-color: #fff; /* Midpoint with white color */
+    }
+    100% {
+        border-color: #149ECA; /* Ending with constant color */
+    }
+}
+
+.user-section{
+    margin-top: 120px;
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+
+}
+
+.user-part,.eligibleCheckPage,.forgot_password{
+    /* border: 2px solid white; */
+    /* margin: 100px 20px 100px 100px;
+    margin-top: 20px; */
+    padding: 20px 50px 50px 100px;
+}
+
+.images-section{
+    /* border: 1px solid white; */
+    border-radius: 10px;
+    width: 800px;
+    height: 525px;
+    padding: 10px;
+}
+
+.images-section::before {
+    border: 1px solid black;
+    border-radius: 10px;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); 
+    z-index: 1; 
+}
+
+.regpopup,.resetpopup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    color: black;
+    transform: translate(-50%, -50%);
+    background-color: #23272F;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    border: 1px solid rgb(65, 63, 63);
+}
+
+.reg-popup-content,.resetpopup {
+    color: #9A9DA1;
+    text-align: center;
+}
+#okButton,#resetokButton{
+    padding: 2px;
+    cursor: pointer;
+    width: 40px;
+    height: 30px;
+    background-color: #0D6D8C;
+    color: #FFFFFF;
+    border: 1px solid #149ECA;
+}
+
+.forgotPassword{
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+}
+
+#captcha-container{
+    font-weight: 500;
+    padding: 5px;
+    text-align: center;
+    width: 100px;
+    height: 40px;
+    border: 1px solid white;
+    border-radius: 20px;
+    background: linear-gradient(45deg, #606dbc 25%, #465298 25%, #465298 50%, #606dbc 50%, #606dbc 75%, #465298 75%);
+    background-size: 10px 10px;
+}
+
+.bi-arrow-clockwise:hover{
+    transition: all .2s ease-in-out;
+    transform: rotateZ(360deg) scale(.8);
+    color: #149ECA;
+}
+
+.notification-box {
+    position: fixed;
+    top: 150px;
+    right: 10px;
+    border-top: 4px solid #1797C1;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    display: none; /* Initially hidden */
+}
+.notification-message {
+    display: inline;
+}
+
+#sendOTP{
+    font-size: 20px;
+    border: 1px solid #1797C1;
+    margin-left: 10px;
+    padding: 13px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    background-color: #1797C1;
+}
+#passwordHint{
+    color: #1797C1;
+}
+
+.tick-mark {
+    color: green;
+    margin-left: 5px;
+}

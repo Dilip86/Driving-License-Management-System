@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DL Payment page</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/neocotic/qrious@4.0.2/dist/qrious.min.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <link rel="stylesheet" href="../src/payment.css">
+    
+</head>
+<body style="background-color: #19374C; color: white;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="name" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="title" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+
+
+    <div class="container-fluid main-content">
+    <p>Congrats you have completed your LL form and completed uploads section. <br>
+    Now you are in the payment page. You have to pay fees for Class of vehicles and for LL Exam.</p>
+    <div id="container">
+        <div class="d-flex">
+        <p>If you want to see the fee structure, click </p><span class="form-control bi bi-list-columns-reverse" id="fee"> Fee Details</span>
+    </div>
+        <div id="feeDetails">
+            <div class="feeDetails-content">
+            <h1><span class="bi bi-newspaper"></span> Calculation of fee<span class="bi bi-x-circle-fill"></span></h1>
+            </div>
+            <ul>
+            <li>For each class of vehicle, the fee is 50/-. If you have selected two, then it will be 100/-. Vice versa for more.</li>
+            <li>For LL Exam, the cost is 100/-</li>
+            <li>If you have selected one class of vehicle, then the total fee will be</li>
+            <li>1 class of vehicle = 50/-</li>
+            <li>LL EXAM = 100</li>
+            <li>Total fee = 150/-</li>
+            </ul>
+        </div>
+        <p>Click on "Continue" to find out how much you have to pay.</p>
+        <button class="form-control" id="getDetails">Continue</button>
+        <div class="feedetailsTable" style="display: none;">
+        <table class="table table-bordered table-hover table-primary w-25 mt-3">
+            <thead>
+                <th>Fee Details</th>
+                <th>Calculation</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Class Of vehicle</th>
+                    <!-- dynamic value comes from the server -->
+                    <td id="classOfVehicle">Fetching...</td>
+                </tr>
+                <tr>
+                    <th>Fee for class</th>
+                    <!-- dynamic value comes from the server -->
+                    <td id="feeForClass"></td>
+                </tr>
+                <tr>
+                    <th>Fee for LL exam</th>
+                    <td>100/-</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total fee (including 18% GST):</th>
+                    <td id="totalFee">Fetching..</td>
+                </tr>
+            </tfoot>
+        </table>
+        </div>
+        <h2>Selected Class of Vehicle</h2>
+        <ul id="selectedClassOfVehicle"></ul>
+    </div>
+    <div id="paymentMsg">
+        <p>Now you have completed all steps. Just initiate the payment. After careful evaluation, you will receive an email from us for the next steps.</p>
+    </div>
+
+    <div id="paymentForm" style="display: none;">
+        <label for="paymentAmount">Payment Amount (INR):</label>
+        <!-- Display the user's total fee as the default payment amount and disable the input -->
+        <div class="d-flex">
+        <input type="number" class="form-control" id="paymentAmount" min="1" step="0.01" disabled>
+        <button class="form-control" id="initiatePayment">Initiate Payment</button>
+        </div>
+    </div>
+
+    <div id="referenceNumber" style="display: none;">
+        <p>Payment Reference Number: <span id="refNumber"></span></p>
+    </div>
+
+    <div id="qrMsg" style="display: none;">
+        <div id="qrEnvelope">
+            <canvas id="qrcode"></canvas>
+        </div>
+        <p>Scan this QR code and submit the form. After evaluation, you will get the LL exam credentials. Tank you.</p>
+        <p>After scanning and filling the form pease click on log out button <button class="form-control" id="allbtnLogout">Log out</button></p>
+    </div>
+</div>    
+        <div class="popup" id="popup">
+            <div class="popup-content">
+                <p class="success">Fees data has been stored in the database for reference.</p>
+                <button id="okButton">Ok</button>
+            </div>
+        </div>
+
+        <div id="notificationBox" class="notification-box">
+            <div id="notificationMessage" class="notification-message">
+                <!--side popup will display here-->
+            </div>
+        </div>
+
+    <script>
+        window.addEventListener("load", function () {
+        setTimeout(function () {
+          document.querySelector(".preloader").style.display = "none";
+          document.body.style.display = "block";
+        }, 300); // 2000 milliseconds = 2 seconds
+      });
+
+      $(".bi-x-circle-fill").click(()=>{
+        $("#feeDetails").hide();
+      });
+
+      $("#getDetails").click(()=>{
+        $(".feedetailsTable").show();
+      });
+
+      $("#okButton").click(()=>{
+        $("#popup").css("display", "none");
+      })
+
+        $(document).ready(function () {
+            let aadharNumber;
+            let feeDetailsVisible = false;
+            let classOfVehicle = [];
+            let user;
+
+            if ($.cookie("aadhar_number") === undefined) {
+                location.href = "index.html";
+            } else {
+                aadharNumber = $.cookie("aadhar_number");
+                document.title = `Driving License Portal - Payment Page: (${aadharNumber})`;
+                $("#title").html(aadharNumber);
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/aadharDetails",
+                    success: function(data){
+                        const aadharData = data;
+                        const user = aadharData.find(entry => entry.aadharNumber === aadharNumber)
+                        if(user){
+                            $("#name").text(user.fullName)
+                        }
+                    }
+                })
+            }
+
+            function showNotification(message){
+                const notificationBox = document.getElementById('notificationBox');
+                const notificationMessage = document.getElementById('notificationMessage');
+                notificationMessage.innerHTML = message;
+                notificationBox.style.display = 'block';
+                setTimeout(function() {
+                    notificationBox.style.display = 'none';
+                }, 5000);
+            }
+
+            $("#btnLogout").click(() => {
+                $.removeCookie("aadhar_number");
+                location.href = "index.html";
+            });
+
+            $("#btnLogout").click(() => {
+                $.removeCookie("aadhar_number");
+                location.href = "index.html";
+            });
+            $("#allbtnLogout").click(() => {
+                $.removeCookie("aadhar_number");
+                location.href = "index.html";
+            });
+
+            $("#fee").click(() => {
+                feeDetailsVisible = !feeDetailsVisible;
+                if (feeDetailsVisible) {
+                    $("#feeDetails").show();
+                } else {
+                    $("#feeDetails").hide();
+                }
+            });
+
+            $('#getDetails').on('click', function () {
+                $.ajax({
+                    method: 'get',
+                    url: 'http://127.0.0.1:4000/llFormData',
+                    success: (LLFormData) => {
+                        user = LLFormData.find(userData => userData.aadharNumber === aadharNumber);
+                        if (user) {
+                            classOfVehicle = user.classOfVehicle || [];
+                            $("#classOfVehicle").text(user.classOfVehicle.join(', '));
+                            const feeForClass = classOfVehicle.length * 50;
+                            $("#feeForClass").text(`${feeForClass}/-`);
+
+                            const gstPercentage = 18;
+                            const gstAmount = (feeForClass + 100) * (gstPercentage / 100);
+                            const totalFee = feeForClass + 100 + gstAmount;
+
+                            $("#totalFee").text(`INR ${totalFee.toFixed(2)}`);
+
+                            const selectedClassOfVehicleList = $("#selectedClassOfVehicle");
+                            selectedClassOfVehicleList.empty();
+                            user.classOfVehicle.forEach(vehicle => {
+                                const listItem = $("<li>").text(vehicle);
+                                selectedClassOfVehicleList.append(listItem);
+                            });
+                            $("#paymentForm").show();
+
+                            $("#paymentAmount").val(totalFee.toFixed(2));
+
+                            // var smsUser = {
+                            //     email: user.email,
+                            //     name: user.fullName,
+                            // }
+                        }
+                    },
+                    error: () => {
+                        alert("An error occurred while fetching data.");
+                    }
+                });
+            });
+
+            $("#initiatePayment").click(() => {
+            // Get the payment amount (which should be the user's total fee)
+            var paymentAmount = parseFloat($("#paymentAmount").val());
+            if (isNaN(paymentAmount) || paymentAmount <= 0) {
+                alert("Invalid payment amount.");
+                return;
+            }
+
+    var referenceNumber = generateUniqueReferenceNumber();
+
+    function generateUniqueReferenceNumber() {
+        return Math.random().toString(36).substr(2, 9);
+    }
+
+
+    $("#refNumber").text(referenceNumber);
+    $("#referenceNumber").show();
+
+    var googleFormLink = "https://docs.google.com/forms/d/e/1FAIpQLSfEdApR_6B_XONCeW0ASN8sc2EtBjdxMoy-_7e1PdjFngdAYw/viewform?usp=sf_link";
+
+    var qr = new QRious({
+        element: document.getElementById('qrcode'),
+        value: googleFormLink,
+        size: 200
+    })
+
+    // Create the payment data object
+    var paymentData = {
+        aadharNumber: aadharNumber,
+        totalFee: paymentAmount,
+        classOfVehicle: classOfVehicle,
+        referenceNumber: referenceNumber
+    };
+
+    function sendMailPaymentReferenceNumber(toEmail, fullName, referenceNumber){
+        Email.send({
+            SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3",
+            To: toEmail,
+            From: "ssati753@gmail.com",
+            Subject: "Payment Reference Number",
+            Body: `Dear User,${fullName}<br/>Congrats you have done your payment successfully.<br/>
+            Your Payment Reference number is ${referenceNumber}. Please use this for any further assistance or queries.
+            Thank you team DL`,
+        }).then(function (message){
+            // alert("Email sent: " + message);
+            showNotification("Payment Details has been sent to your mail id")
+        });
+
+    }
+
+    // Send the payment data to your server to store in the database
+    $.ajax({
+        method: 'post',
+        url: 'http://127.0.0.1:4000/LLfeeData',
+        data: JSON.stringify(paymentData),
+        contentType: "application/json",
+        success: function (response) {
+            // alert("Fees data has been stored in the database for reference.");
+            $("#popup").css("display", "block");
+            $("#container").css("display", "none");
+            $("#paymentMsg").css("display", "block");
+            $("#qrMsg").show();
+            $("#qrEnvelope").css("animation", "revealEnvelope 1s ease-in-out forwards");
+
+            sendMailPaymentReferenceNumber(user.email, user.fullName, referenceNumber);
+
+        },
+        error: function (error) {
+            alert("Error occurred while storing fee details in the database");
+        }
+    });
+});
+
+        });
+    </script>
+</body>
+</html>

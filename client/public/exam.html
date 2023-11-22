@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LL Exam Page</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="../src/exam.css">
+</head>
+<body>
+    <div id="examCredentialPage">
+        <div class="container d-flex justify-content-center mt-5">
+            <form>
+                <div class="form-floating mt-3">
+                <input type="text" class="form-control" id="LLreferenceNumber" placeholder="LL Reference Number" required disabled>
+                <label for="LLreferenceNumber">LL Reference Number</label>
+                </div>
+                <div class="form-floating mt-3">
+                <input type="text" class="form-control" id="examId" placeholder="Enter your exam id"  required>
+                <label for="examId">Exam Id</label>
+                </div>
+                <div class="form-floating mt-3">
+                <input type="password" class="form-control" name="password" id="examPassword" placeholder="Enter Password" required>
+                <label for="examPassword">Password</label>
+                </div>
+                <button id="btnLogin" class="form-control btn btn-primary mt-2">Log in</button>
+            </form>
+        </div>
+        <div>
+            <p class="examPara d-flex justify-content-center mt-5">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil <br>
+                architecto odio, aspernatur enim adipisci facilis suscipit quidem<br>
+                pariatur quis maiores autem deserunt facere! Quibusdam blanditiis <br>
+                unde molestiae odio temporibus odit!
+            </p>
+        </div>
+    </div>
+    <div id="quizPage" style="display: none;">
+        <h2>Welcome to LL Exam page</h2>
+        <p>Give the exam Thank you</p>
+        <button id="btnStart" class="btn btn-primary">Start Quiz</button>
+    </div>
+    <div id="start" style="display: none;">
+        <div id="userDetail">
+            <span id="LLreferenceNumber"></span><br>
+            <span id="examId"></span>
+        </div>
+        <div id="questionContainer" class="m-5">
+            <!-- Buttons will be added dynamically here -->
+        </div>
+    </div>
+    <div id="timer" style="display: none;">
+        Time Left: <span id="minutes">20</span>:<span id="seconds">00</span> <span class="bi bi-clock blinking"></span>
+    </div>
+
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+        const passMark = 12;
+        let aadharNumber;
+        let currentQuestionIndex = 0;
+        let userResponses = [];
+        let score = 0;
+        let uniqueLLID;
+        let minutes = 20; // Initial minutes
+        let seconds = 0;  // Initial seconds
+        let timerInterval; // Interval variable
+
+        $(document).ready(function () {
+            if ($.cookie("aadhar_number") === undefined) {
+                location.href = "index.html";
+            } else {
+                aadharNumber = $.cookie("aadhar_number");
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/examCredentials",
+                    success: function (data) {
+                        const examData = data.find(credentials => credentials.aadharNumber === aadharNumber);
+                        if (examData) {
+                            $('#LLreferenceNumber').val(examData.LLreferenceNumber);
+                        }
+                    }
+                })
+            }
+
+            $("#btnLogin").click((e) => {
+                e.preventDefault();
+                var examId = $("#examId").val();
+                var examPassword = $("#examPassword").val();
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/examCredentials",
+                    success: function (data) {
+                        const examData = data.find(credentials =>
+                            credentials.examId === examId && credentials.examPassword === examPassword);
+                        if (examData) {
+                            // Fetch quiz questions dynamically here
+                            fetchQuizQuestions();
+                        } else {
+                            alert('You entered data is not matching');
+                        }
+                    }
+                });
+            });
+        });
+
+        // Function to fetch quiz questions dynamically
+        function fetchQuizQuestions() {
+            $.ajax({
+                method: "GET",
+                url: "http://127.0.0.1:4000/quizQuestions",
+                success: function (questions) {
+                    // Store the fetched questions in the 'questions' array
+                    window.questions = questions;
+                    const LLreferenceNumber = $("#LLreferenceNumber").val();
+                    const examId = $("#examId").val();
+                    // Show the quiz page and start the quiz
+                    $("#examCredentialPage").hide();
+                    $("#quizPage").show();
+
+                    $("#userDetail #LLreferenceNumber").text("LL Reference Number: " + LLreferenceNumber);
+                    $("#userDetail #examId").text("Exam ID: " + examId);
+
+                    $("#timer").css("display", "block");
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error loading questions: " + error);
+                }
+            });
+        }
+
+        function exitFullscreen(){
+            if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+
+        // Function to start and handle the quiz
+        $("#btnStart").on("click", function () {
+            if(document.documentElement.webkitRequestFullscreen){
+                document.documentElement.webkitRequestFullscreen();
+            }
+
+            $("#quizPage").hide();
+            $("#start").show();
+            loadQuestion(currentQuestionIndex);
+            startTimer();
+        });
+
+        function loadQuestion(index) {
+            if (index < questions.length) {
+                const question = questions[index];
+                $("#questionContainer").html(`<p>${question.question}</p>`);
+                const options = question.options.map((option) => {
+                    return `<label><input type="radio" name="answer" value="${option.charAt(0)}"> ${option}</label><br>`;
+                });
+                $("#questionContainer").append(options.join(""));
+                if (index === 19) {
+                    // Add the "Submit" button for the 20th question
+                    $("#questionContainer").append('<button id="btnSubmit">Submit</button>');
+                    // Handle the "Submit" button click event
+                    $("#btnSubmit").on("click", function () {
+                        uniqueLLID = generateLLUniqueId();
+                        evaluateResponse();
+                        $.ajax({
+                            method: "get",
+                            url: "http://127.0.0.1:4000/llFormData",
+                            success: function(llFormData){
+                                // this is for fetching the email id name of specific user who is logged or giving exam
+                                const userLLData = llFormData.find(data => data.aadharNumber === aadharNumber);
+                                if(userLLData){
+                                    const toEmail = userLLData.email;
+                                    const fullName = userLLData.fullName;
+                                    if (score >= passMark){
+                                        sendPassedNotification(toEmail,aadharNumber,fullName, uniqueLLID);
+                                        alert(`You have completed your ll test and passed.  And your UNique LLid is:-${uniqueLLID}. Keepthis with you for future need.`)
+                                    } else {
+                                        sendFailedNotification(toEmail, aadharNumber, fullName);
+                                        alert("you not cleared exam ")
+                                    }
+                                }
+                            }
+                        });
+
+                    //     function savePassedUsers(){
+                    //     $.ajax({
+                    //         method: "post",
+                    //         url: "http://127.0.0.1:4000/examStatus",
+                    //         data:{
+                    //             aadharNumber: aadharNumber,
+                    //             LLreferenceNumber: $("#LLreferenceNumber").val(),
+                    //             examId: $("#examId").val(),
+                    //             examStatus: "pass", //pass or fail
+                    //             score: score,
+                    //             uniqueLLID: uniqueLLID,
+                    //             formattedDate: formattedDate,
+                    //             expiryDate: expiryDate
+                    //         },
+                    //         success: function(){
+                    //             // location.href = "index.html";
+                    //             alert(`Your data has stored successfully`)
+                    //             },
+                    //             failure: function() {
+                    //                 alert("Failed");
+                    //                 }
+                    //     })
+                    // }
+                    });
+                } else {
+                    // Add the "Next" button for other questions
+                    $("#questionContainer").append('<button id="btnNext">Next</button');
+                    // Handle the "Next" button click event
+                    $("#btnNext").on("click", function () {
+                        const selectedAnswer = $("input[name=answer]:checked").val();
+                        if (selectedAnswer) {
+                            userResponses.push(selectedAnswer);
+                            // console.log("User's response to question " + (currentQuestionIndex + 1) + ": " + selectedAnswer);
+                            $("#questionContainer").empty();
+                            currentQuestionIndex++;
+                            if (currentQuestionIndex === questions.length) {
+                                // All questions answered
+                                exitFullscreen(); // Exit full-screen mode
+                                evaluateResponse();
+                            } else {
+                                loadQuestion(currentQuestionIndex);
+                            }
+                        } else {
+                            alert("Please select an answer before moving to the next question.");
+                        }
+                    });
+                }
+            }
+        }
+
+        function evaluateResponse() {
+            const correctAnswers = questions.map((question) => question.answer);
+            score = 0;
+
+            for (let i = 0; i < correctAnswers.length; i++) {
+                if (userResponses[i] === correctAnswers[i]) {
+                    score++;
+                }
+            }
+
+            if (score >= passMark) {
+                const uniqueLLID = generateLLUniqueId();
+                $("#questionContainer").html('<p style="color:green;">Congratulations! You have passed this exam.</p>');
+                // You can add code here to send a success message via email.
+                $("#questionContainer").append('<button id="btnLogout">Log Out</button>');
+                savePassedUsers();
+                    // Handle the logout button click
+                    $("#btnLogout").on("click", function () {
+                        // Remove the cookie
+                        $.removeCookie("aadhar_number");
+                        // Redirect to the index.html page
+                        window.location.href = "index.html";
+                    });
+            } else {
+                $("#questionContainer").html('<p style="color:red;">Sorry, you did not pass this exam.</p>');
+                // You can add code here to send a failure message via email.
+                $("#questionContainer").append('<button id="btnLogout">Log Out</button>');
+                saveFailedUserDetails();
+                // Handle the logout button click
+                $("#btnLogout").on("click", function () {
+                    // Remove the cookie
+                    $.removeCookie("aadhar_number");
+                    // Redirect to the index.html page
+                    window.location.href = "index.html";
+                });
+            }
+        }
+
+        function saveFailedUserDetails() {
+            // Get the user's details (e.g., LL reference number, exam ID, etc.)
+            const LLreferenceNumber = $("#LLreferenceNumber").val();
+            const examId = $("#examId").val();
+            // Add more details as needed
+
+            // Send the user's details to a different URL endpoint for failed users
+            $.ajax({
+                method: "post",
+                url: "http://127.0.0.1:4000/failedUserDetails",
+                data: {
+                    aadharNumber: aadharNumber,
+                    LLreferenceNumber: LLreferenceNumber,
+                    examId: examId,
+                    examStatus: (score >= passMark) ? "pass": "fail",
+                    // Add more details here
+                },
+                success: function () {
+                    console.log("User details for failed exam saved successfully.");
+                },
+                error: function () {
+                    console.log("Failed to save user details for the failed exam.");
+                }
+            });
+        }
+
+        function savePassedUsers(){
+                        $.ajax({
+                            method: "post",
+                            url: "http://127.0.0.1:4000/examStatus",
+                            data:{
+                                aadharNumber: aadharNumber,
+                                LLreferenceNumber: $("#LLreferenceNumber").val(),
+                                examId: $("#examId").val(),
+                                examStatus: "pass", //pass or fail
+                                score: score,
+                                uniqueLLID: uniqueLLID,
+                                formattedDate: formattedDate,
+                                expiryDate: expiryDate
+                            },
+                            success: function(){
+                                // location.href = "index.html";
+                                alert(`Your data has stored successfully`)
+                                },
+                                failure: function() {
+                                    alert("Failed");
+                                    }
+                        })
+                    }
+
+        function generateLLUniqueId() {
+            const prefix = "LL";
+            const randomNumber = Math.floor(1000000000 + Math.random() * 9000000000); // Generates an 10-digit random number
+            return prefix + randomNumber;
+        }
+
+        // Example usage:
+        uniqueLLID = generateLLUniqueId();
+        // console.log(uniqueLLID); // Output will be like LL1234567890 (with random numbers)
+
+        //function for today date printing
+        function getFormattedCurrentDate() {
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+            const day = currentDate.getDate().toString().padStart(2, "0");
+            return `${year}/${month}/${day}`;
+        }
+
+        // Call the function to get today's date
+        const formattedDate = getFormattedCurrentDate();
+        // console.log(formattedDate);
+
+        //function for expiry date
+        function getExpiryDate() {
+            const currentDate = new Date();
+            const futureDate = new Date(currentDate);
+            futureDate.setMonth(currentDate.getMonth() + 6); // Add 6 months to the current date
+
+            const year = futureDate.getFullYear();
+            const month = (futureDate.getMonth() + 1).toString().padStart(2, "0");
+            const day = futureDate.getDate().toString().padStart(2, "0");
+
+            return `${year}/${month}/${day}`;
+        }
+
+        // Call the function to get the expiry date
+        const expiryDate = getExpiryDate();
+        // console.log(expiryDate);
+
+        //if the specific user will pass then this mail will get
+        function sendPassedNotification(toEmail, aadharNumber, fullName){
+            const expiryDate = getExpiryDate();
+            const formattedDate = getFormattedCurrentDate();
+            Email.send({
+                    SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3",
+                    To: toEmail,
+                    From: "ssati753@gmail.com",
+                    Subject: "Congratulations! You have passed LL exam.",
+                    Body: `Dear User, ${fullName}<br/>
+                    <p>Your Aadhar Number:- ${aadharNumber}</p>
+                    <p>You have creared your LL exam which have given today.</p>
+                    <p>And this is your LL Unique Id <strong>${uniqueLLID}</strong> keep it with you for your future.</p>
+                    <p>Now you can download your Learner's License in the main page of our website, by using your credentials.</p>
+                    <p>And it is valid from ${formattedDate} to ${expiryDate}.</p>
+                    <p>Thank you team LL</p>`
+                }).then(function (message){
+                    alert("Email sent: "+ message);
+                });
+        }
+
+        //if the user is failed in lexam then this mail have to send to user
+        function sendFailedNotification(toEmail, aadharNumber, fullName){
+            Email.send({
+                    SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3",
+                    To: toEmail,
+                    From: "ssati753@gmail.com",
+                    Subject: "Sorry! You have failed LL exam.",
+                    Body: `Dear User, ${fullName}<br/>
+                    <p>Your Aadhar Number:- ${aadharNumber}</p>
+                    <p>You have failed your LL exam which have given today.</p>
+                    <p>Please pay the fee for re exam and give the exam. </p><br>
+                    <p>After 7 days you can give the exam.</p>
+                    <p>Thank you team LL</p>`
+                }).then(function (message){
+                    alert("Email sent: "+ message);
+                });
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(function () {
+                if (seconds > 0) {
+                    seconds--;
+                } else if (minutes > 0) {
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    // Time is up, handle this as needed
+                    clearInterval(timerInterval);
+                    alert("Time's up! Your quiz is now completed.");
+                    window.location.href = "index.html";
+                    // Add code to automatically submit the quiz or do other actions
+                }
+
+                // Update the timer display
+                updateTimerDisplay();
+            }, 1000); // Update every 1 second
+        }
+
+        // Function to update the timer display
+        function updateTimerDisplay() {
+            const minutesDisplay = String(minutes).padStart(2, "0");
+            const secondsDisplay = String(seconds).padStart(2, "0");
+            document.getElementById("minutes").textContent = minutesDisplay;
+            document.getElementById("seconds").textContent = secondsDisplay;
+            
+        }
+
+
+            
+    </script>
+</body>
+</html>

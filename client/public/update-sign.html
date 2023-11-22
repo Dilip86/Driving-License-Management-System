@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Signature Page</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="../src/update-sign.css">
+</head>
+<body style="background-color: #19374C; color: white;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="name" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="title" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+    <div class="main-content">
+    <div class="container">
+        <h3>To view the submitted signature earlier please click on the view button below.</h3>
+        <button id="btnView">View</button><br>
+        <label>Aadhar Number</label><br>
+        <input type="text" id="aadharNumber" required disabled><br>
+        <label>Signature</label><br>
+        <img src="" alt="signature" style="height: 100px; width: 200px;">
+    </div>  
+    
+    <p>if you want to update your signature update here</p>
+    <label for="signatureImage" class="mt-2">Upload Signature:</label>
+        <input type="file" class="form-control mt-2 w-25" name="signatureImage" id="signatureImage" required accept="image/*">
+        <button class="form-control mt-3" id="btnUpdate">Update Signature</button>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <p class="success">Signature Updated successfully</p>
+            <button id="okButton">Ok</button>
+        </div>
+    </div>
+    <script>
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+            document.querySelector(".preloader").style.display = "none";
+            document.body.style.display = "block";
+            }, 300); // 2000 milliseconds = 2 seconds
+        });
+
+        $(document).ready(function(){
+            let aadharNumber; 
+
+                if ($.cookie("aadhar_number") === undefined) {
+                    location.href = "main.html";
+                } else {
+                    aadharNumber = $.cookie("aadhar_number");
+                }
+                $("#btnLogout").click(() => {
+                    $.removeCookie("aadhar_number");
+                    location.href = "main.html";
+                });
+
+                $("#okButton").click(()=>{
+                    window.location.href = "index.html"
+                })
+
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/aadharDetails",
+                    success: (data)=>{
+                        const user = data.find(aadharData => aadharData.aadharNumber === aadharNumber);
+                        if(user){
+                            $("#name").text(user.fullName);
+                            $("#title").text(user.aadharNumber)
+                        };
+                    }
+                });
+            
+             $("#btnView").click(()=>{
+                $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/uploads",
+                success: (signData)=>{
+                    // console.log(data);
+                    const user = signData.find(userData => userData.aadharNumber === aadharNumber);
+                    // console.log(user);
+                    const imgSrc = `data:image/png;base64,${user.signature}`;
+                    $('#aadharNumber').val(`${user.aadharNumber}`)
+                    $('img[alt="signature"]').attr('src', imgSrc);
+                                     
+                }
+                });
+
+             });
+             
+             $("#btnUpdate").click(()=>{
+                var fileInput = document.getElementById('signatureImage');
+                var file = fileInput.files[0];
+                // var id = aadharNumber;
+
+                if (file) {
+                var formData = new FormData();
+                formData.append('signatureImage', file);
+                formData.append('aadharNumber', aadharNumber);
+
+                $.ajax({
+                    method: "put",
+                    url: `http://127.0.0.1:4000/updateSignature/${aadharNumber}`,
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data) {
+                        // alert("Signature updated successfully");
+                        $("#popup").css("display", "block")
+                    },
+                    error: function(error) {
+                        alert("Error: " + error.responseText);
+                    }
+                });
+            } else {
+                alert("Please select a signature image to upload.");
+            }
+        });
+
+        });           
+
+    </script>
+</body>
+</html>

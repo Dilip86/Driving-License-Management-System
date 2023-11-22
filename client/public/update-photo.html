@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Photo Page</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script src="https://kit.fontawesome.com/9e082aa5ef.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../src/update-photo.css">
+</head>
+<body style="background-color: #19374C; color: white;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="name" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="title" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+    <div class="main-content">
+    <div class="container">
+        <h3>To view the submitted photo earlier please click on the view button below.</h3>
+        <button id="btnView">View</button><br>
+        <label>Aadhar Number</label><br>
+        <input type="text" id="aadharNumber" required disabled><br>
+        <label>Captured Photo</label><br>
+        <img src="" alt="captured photo" style="height: 300px; width: 250px;">
+    </div>  
+    
+    <p>if you want to update your capture photo update here</p>
+    <label>capture photo:</label>
+    <label>Upload Photo</label><br>
+    <button class="form-control" id="openCamera">Open Camera</button><br>
+    <div class="photo" style="display: none;">
+        <div class="video-wrap">
+            <video id="video" playsinline autoplay></video>
+            <button class="form-control" id="capture"><i class="fa-solid fa-camera fa-beat"></i> Capture Photo</button>
+        </div>
+        </div>
+            <div class="controller">
+                <button id="retake">Retake Photo</button>
+            </div>
+
+            <canvas id="canvas" width="250" height="300"></canvas>
+<br>
+<button class="form-control" id="btnUpdate">Update photo</button>
+            <span id="ErrorMsg"></span>
+
+        
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <p class="success">captured photo updated successfully</p>
+            <button id="okButton">Ok</button>
+        </div>
+    </div>
+
+    <script>
+         window.addEventListener("load", function () {
+            setTimeout(function () {
+            document.querySelector(".preloader").style.display = "none";
+            document.body.style.display = "block";
+            }, 300); // 2000 milliseconds = 2 seconds
+        });
+
+        $(document).ready(function(){
+            let aadharNumber; 
+
+                if ($.cookie("aadhar_number") === undefined) {
+                    location.href = "main.html";
+                } else {
+                    aadharNumber = $.cookie("aadhar_number");
+                }
+                $("#btnLogout").click(() => {
+                    $.removeCookie("aadhar_number");
+                    location.href = "main.html";
+                });
+                // get user details from database and display it in navbar
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/aadharDetails",
+                    success: (data)=>{
+                        const user = data.find(aadharData => aadharData.aadharNumber === aadharNumber);
+                        if(user){
+                            $("#name").text(user.fullName);
+                            $("#title").text(user.aadharNumber)
+                        };
+                    }
+                });
+                $("#openCamera").click(()=>{
+                $(".photo").css("display","block")
+            })
+
+            $("#capture").click(()=>{
+                $(".photo").css("display","none")
+            })
+            $("#retake").click(()=>{
+                $(".photo").css("display","block")
+            });
+
+            $("#okButton").click(()=>{
+                window.location.href= "index.html";
+            });
+
+             $("#btnView").click(()=>{
+                $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/capturedPhoto",
+                success: (photoData)=>{
+                    // console.log(data);
+                    const user = photoData.find(userData => userData.aadharNumber === aadharNumber);
+                    // console.log(user);
+                    const imgSrc = `data:image/png;base64,${user.image}`;
+                    $('#aadharNumber').val(`${user.aadharNumber}`)
+                    $('img[alt="captured photo"]').attr('src', imgSrc);
+                                     
+                }
+                });
+             });
+
+             const openCamera = $('#openCamera');
+            const video = $('#video');
+            const canvas = $('#canvas');
+            const capture = $('#capture');
+            const retake = $('#retake');
+            const btnSave = $('#btnSave');
+            const errorMsgElement = $('#ErrorMsg');
+            const capturedImage = $('#capturedImage');
+
+            let capturedPhotoUrl = null;
+
+
+            const constraints = {
+                video: {
+                    width: 250, height: 300
+                }
+            };
+
+            async function init() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    handleSuccess(stream);
+                } catch (e) {
+                    errorMsgElement.html(`navigator.getUserMedia.error:${e.toString()}`);
+                }
+            }
+
+            function handleSuccess(stream) {
+                window.stream = stream;
+                video.prop('srcObject', stream);
+                $('.video-wrap').css('display', 'block');
+                $('.controller').css('display', 'block');
+            }
+
+            openCamera.on('click', function () {
+                init();
+            });
+
+            var context = canvas[0].getContext('2d');
+
+            function clearCanvas() {
+                context.clearRect(0, 0, canvas[0].width, canvas[0].height);
+            }
+
+            capture.on('click', function () {
+                context.drawImage(video[0], 0, 0, 250, 300);
+                capturedPhotoUrl = canvas[0].toDataURL('image/png');
+                capturedImage.attr('src', capturedPhotoUrl);
+            });
+
+            retake.on('click', function () {
+                clearCanvas();
+                capturedPhotoUrl = null;
+                capturedImage.attr('src', '');
+            });
+
+            $('#btnUpdate').on('click', function () {
+        const aadharNumber = $("#aadharNumber").val();
+
+    if (capturedPhotoUrl) {
+        console.log('Captured Photo URL:', capturedPhotoUrl);
+
+        capturedImage.attr('src', capturedPhotoUrl);
+
+        // Convert Data URL to Blob
+        const blob = dataURLtoBlob(capturedPhotoUrl);
+
+        // Prepare the data for upload
+        const data = new FormData();
+        data.append('image', blob, 'image.png');
+        data.append('aadharNumber', aadharNumber);
+
+        $.ajax({
+            method: 'put',
+            url: `http://127.0.0.1:4000/capturedPhotoUpdate/${aadharNumber}`, // Change this URL to your server endpoint
+            data: data,
+            contentType: false, // Ensure this is set to false for FormData
+            processData: false, // Ensure this is set to false for FormData
+            success: function (response) {
+                // alert("captured photo updated successfully");
+                $("#popup").css("display", "block");
+            },
+            error: function (xhr, status, error) {
+                console.error('Error uploading image: ' + JSON.stringify(error));
+            }
+        });
+    }else {
+            alert('Please capture a photo before updating.');
+        }
+});
+
+function dataURLtoBlob(dataURL) {
+    const parts = dataURL.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = atob(parts[1]);
+    const rawLength = raw.length;
+    const uint8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
+        uint8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uint8Array], { type: contentType });
+}
+
+
+
+             
+             
+ });           
+
+    </script>
+</body>
+</html>

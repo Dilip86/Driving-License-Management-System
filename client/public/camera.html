@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera App</title>
+</head>
+<body>
+    <button id="openCamera">Open Camera</button>
+    <button id="capturePhoto">Capture Photo</button>
+    <button id="confirmPhoto">Confirm Photo</button>
+    <button id="retakePhoto">Retake Photo</button>
+    <button id="uploadPhoto">Upload Photo</button>
+
+    <div id="cameraStream" style="display: none;">
+        <video id="video" autoplay></video>
+    </div>
+
+    <div id="capturedImage" style="display: none;">
+        <img id="capturedImg" alt="Captured Image">
+    </div>
+
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script>
+      // Variables
+let finalImage = null;
+let videoStream = null;
+
+// Initialize the camera
+$('#openCamera').click(function() {
+    $('#cameraStream').show();
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            videoStream = stream;
+            $('#video').get(0).srcObject = stream;
+        })
+        .catch(function(error) {
+            console.error('Error accessing the camera: ' + error);
+        });
+});
+
+// Capture Photo
+$('#capturePhoto').click(function() {
+    const canvas = document.createElement('canvas');
+    const video = $('#video').get(0);
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    finalImage = canvas.toDataURL('image/png');
+    $('#capturedImg').attr('src', finalImage);
+    $('#capturedImage').show();
+});
+
+// Confirm Photo
+$('#confirmPhoto').click(function() {
+    if (finalImage) {
+        // Image is confirmed and can be uploaded
+        $('#cameraStream').hide();
+        $('#capturedImage').hide();
+    }
+});
+
+// Retake Photo
+$('#retakePhoto').click(function() {
+    if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+    }
+    $('#cameraStream').show();
+
+    // Add this part to re-initialize the camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            videoStream = stream;
+            const video = $('#video').get(0);
+            video.srcObject = stream;
+        })
+        .catch(function(error) {
+            console.error('Error re-accessing the camera: ' + error);
+        });
+});
+
+// Upload Photo using AJAX
+$('#uploadPhoto').click(function() {
+    if (finalImage) {
+      const blob = dataURLtoBlob(finalImage); // Convert data URL to Blob
+        const file = new File([blob], 'image.png', { type: 'image/png' });
+
+        const formData = new FormData();
+        formData.append('image', file); // Use the field name "image" here
+        $.ajax({
+            url: 'http://127.0.0.1:5000/uploads',
+            type: 'POST',
+            data: formData,
+            processData: false, // Set processData to false
+            contentType: false,
+            success: function(response) {
+                console.log('Image uploaded successfully: ' + response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error uploading image: ' + JSON.stringify(error)); // Add JSON.stringify for detailed error message
+            }
+        });
+    }
+});
+
+function dataURLtoBlob(dataURL) {
+    const parts = dataURL.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uint8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
+        uint8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uint8Array], { type: contentType });
+}
+
+    </script>
+</body>
+</html>

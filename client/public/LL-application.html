@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- here title will be dynamically come -->
+    <title></title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="../src/ll-application.css">
+    <script src="https://kit.fontawesome.com/9e082aa5ef.js" crossorigin="anonymous"></script>
+</head>
+<body style="background-color: #19374C; color: white;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="name" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="title" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+
+        
+    <div class="main-content container-fluid">
+    <p id="firstContinue">Do you want to continue with LL Application then click on to <span class="bi bi-arrow-down-left-circle"></span> <button id="btnContinue" class="form-control">continue</button></p>
+    
+    <div id="LLForm">
+        <div class="d-flex">
+        <div class="me-5">
+            <dd>Aadhar Number</dd>
+            <dt><input type="text" class="form-control w-100" id="daadharNumber"  required disabled></dt>
+        </div>
+        <div class="me-5">
+            <dd>Full Name</dd>
+            <dt><input type="text" class="form-control w-100" id="dfullName" required disabled></dt>
+        </div>
+        <div class="me-5">    
+            <dd>Date of Birth</dd>
+            <dt><input type="text" class="form-control w-100" id="dDOB" required disabled></dt>
+        </div>
+        </div>
+        <div class="d-flex mt-4">
+            <div class="me-5">
+                <dd>Gender</dd>
+                <dt><input type="text" class="form-control w-100" id="dGender" required disabled></dt>
+            </div>
+            <div class="me-5">
+                <dd>Phone Number</dd>
+                <dt><input type="text" class="form-control w-100" id="dPhone" required disabled></dt>
+            </div>
+            <div class="me-5">
+                <dd>Email</dd>
+                <dt><input type="text" class="form-control w-100" id="dEmail" required disabled></dt>
+            </div>
+        </div>
+
+        <div class="d-flex">
+            <div class="me-5 donor">
+                <dd>Are you an organ donor?</dd>
+                <dt>
+                    <input type="radio" class="form-check-input" name="donor" id="donorYes" value="yes"> Yes
+                    <input type="radio" class="form-check-input" name="donor" id="donorNo" value="no"> No
+                </dt>
+             </div>
+    <div class="me-5 organ">
+        <dd>Blood Group</dd>
+        <dt><input type="text" class="form-control" id="group" required></dt>
+    </div>
+
+    <div class="me-5 vehicle">
+    <dd>For which Class of Vehicle you want LL?</dd>
+    <dt><input type="checkbox" class="form-check-input" id="classV" value="TWWOG"> Two wheeler without gear</dt>
+    <dt><input type="checkbox" class="form-check-input" id="classV" value="TWWG"> Two wheeler with gear</dt>
+    <dt><input type="checkbox" class="form-check-input" id="classV" value="FW"> Four wheeler</dt>
+    </div>
+</div>
+    <button class="form-control mt-4" id="btnSubmit">Submit</button>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <p class="success">Data stored successfully... <br>Your reference number is( <span id="successMessage"></span> )</p>
+            <button id="okButton">Ok</button>
+        </div>
+    </div>
+
+    <div id="notificationBox" class="notification-box">
+        <div id="notificationMessage" class="notification-message">
+            <!--side popup will display here-->
+        </div>
+    </div>
+
+    
+    <div id="uploads">
+        <p>You are here in uploads section, just few things left for your LL Exam <br>
+        please continue to next process uploads section</p>
+        <h4>Uploads Section</h4>
+        <form>
+            <input type="text" class="form-control w-25" name="aadharNumber" id="uploadsAadharNumber" required disabled/>
+            <label for="signatureImage" class="mt-2">Upload Signature:</label>
+            <input type="file" class="form-control mt-2 w-25" name="signatureImage" id="signatureImage" required accept="image/*">
+            <button type="submit" class="form-control mt-3" id="btnUpload">Upload Signature</button>
+        </form>
+    </div>    
+        <div id="photoUpload">
+            <p>Please Upload Your Live Photo Here</p>
+            <p>Now here click on open camera button and capture your photo, if captured photo is looking good then click on Save button <br>
+            otherwise retake photo</p>
+            <input type="text" class="form-control w-25" name="aadharNumber" id="photoUploadAadharNumber" required disabled/><br>
+            <label>Upload Photo</label><br>
+            <button class="form-control" id="openCamera">Open Camera</button><br>
+            <div class="photo" style="display: none;">
+            <div class="video-wrap">
+                <video id="video" playsinline autoplay></video>
+                <button class="form-control" id="capture"><i class="fa-solid fa-camera fa-beat"></i> Capture Photo</button>
+            </div>
+            </div>
+            <div class="controller">
+                
+                <button class="form-control" id="retake">Retake Photo</button>
+            </div>
+            
+            <canvas id="canvas" width="250" height="300"></canvas>
+            <br>
+            <button class="form-control" id="btnSave">Save</button>
+            <span id="ErrorMsg"></span>
+
+            <!-- <img id="capturedImage" height="300" width="250"> -->
+
+        </div>
+        
+    
+    </div>
+    <div class="payment-popup" id="paymentPopup" style="display: none;">
+        <div class="payment-popup-content">
+            <p class="payment-success">Captured Photo Uploaded successfully in database. <br>Now you are navigating to Payemnt Page</p>
+            <button class="form-control" id="paymentOkButton">Ok</button>
+        </div>
+    </div>
+
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+            document.querySelector(".preloader").style.display = "none";
+            document.body.style.display = "block";
+            }, 300); // 2000 milliseconds = 2 seconds
+        });
+
+        $(document).ready(function(){
+
+            $("#openCamera").click(()=>{
+                $(".photo").css("display","block")
+            })
+
+            $("#capture").click(()=>{
+                $(".photo").css("display","none")
+            })
+            $("#retake").click(()=>{
+                $(".photo").css("display","block")
+            });
+
+            
+           
+            
+                let aadharNumber; 
+
+                if ($.cookie("aadhar_number") === undefined) {
+                    location.href = "main.html";
+                } else {
+                    aadharNumber = $.cookie("aadhar_number"); 
+                    document.title = `Driving License Portal - Main:(${aadharNumber})`;
+                    $("#title").html(aadharNumber);
+                    $("#aadharNumber").val(aadharNumber);
+
+                    $.ajax({
+                        method: "get",
+                        url: "http://127.0.0.1:4000/aadharDetails",
+                        success: (aadharData) => {
+                            const user = aadharData.find(userData => userData.aadharNumber === aadharNumber);
+                            if (user) {
+                                $("#name").text(user.fullName); 
+                            }
+                        },
+                        error: () => {
+                            alert("An error occurred while fetching data.");
+                        }
+                    });
+                }
+
+                $("#btnLogout").click(() => {
+                    $.removeCookie("aadhar_number");
+                    location.href = "index.html";
+                });
+
+                $("#btnContinue").click(()=>{
+                    $.ajax({
+                        method: "get",
+                        url: "http://127.0.0.1:4000/aadharDetails",
+                        success:(aadharData) => {
+                            const user = aadharData.find(userData => userData.aadharNumber === aadharNumber);
+                            if(user){
+                                $("#daadharNumber").val(user.aadharNumber);
+                                $("#dfullName").val(user.fullName);
+                                $("#dDOB").val(user.dateOfBirth);
+                                $("#dGender").val(user.gender);
+                                $("#dPhone").val(user.phone);
+                                $("#dEmail").val(user.email);
+                                $("#photoUploadAadharNumber").val(user.aadharNumber);
+                                $("#uploadsAadharNumber").val(aadharNumber);
+                            }
+                        }
+                    });
+                });
+
+
+                $("#btnSubmit").click(()=>{
+                    var selectedVehicles = []; // To store the selected class of vehicles
+                        $("#classV:checked").each(function() {
+                            selectedVehicles.push($(this).val());
+                        });
+                    
+                    var donorValue = $("input[name='donor']:checked").val();
+                    if (!donorValue) {
+                        // If neither "Yes" nor "No" is selected, you can handle it here as needed.
+                        // For example, you can set it to "no" by default.
+                        donorValue = "no";
+                    }
+
+                    $("#aadharNumber").val($("#daadharNumber").val());
+
+                    var lldata = {
+                        aadharNumber : $("#daadharNumber").val(),
+                        fullName: $("#dfullName").val(),
+                        dateOfBirth: $("#dDOB").val(),
+                        gender: $("#dGender").val(),
+                        phone: $("#dPhone").val(),
+                        email: $("#dEmail").val(),
+                        organDonor: donorValue,
+                        bloodGroup: $("#group").val(),
+                        classOfVehicle: selectedVehicles,
+                    }
+
+                    $.ajax({
+                        method: "post",
+                        url: "http://127.0.0.1:4000/addLLData",
+                        data: lldata,
+                        success: function(response) {
+                            if (response && response.referenceNumber){
+                                sendCongratulationEmail($("#dEmail").val(), response.referenceNumber);
+                                $("#popup").css("display", "block")
+                                $("#successMessage").text(response.referenceNumber);                            
+                            } else{
+                                alert("error occured")
+                            }
+                     },
+                     error: function(error) {
+                    alert("An error occurred while storing data.");
+                }
+                    })
+                });
+
+                function sendCongratulationEmail(toEmail, referenceNumber){
+                    Email.send({
+                        SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3",
+                        To: toEmail,
+                        From: "ssati753@gmail.com",
+                        Subject: "Congratulations! Registration Successful",
+                        Body: `Dear User,<br/> <p>Your registration has been successful.</p><br/>
+                               <p>You moved a step forward for your Learner License Process.</p><br/>
+                               <p>Your reference number for LL is ${referenceNumber}.</p><br/>
+                               <p>Keep this with you for your future reference.</p>`
+                    }).then(function (message){
+                        // alert("Email sent: "+ message);
+                        showNotification("An Email sent to your mail id");
+                    });
+                }
+
+                function showNotification(message){
+                    const notificationBox = document.getElementById('notificationBox');
+                    const notificationMessage = document.getElementById('notificationMessage');
+                    notificationMessage.innerHTML = message;
+                    notificationBox.style.display = 'block';
+                    setTimeout(function() {
+                        notificationBox.style.display = 'none';
+                    }, 5000);
+                }
+
+                $("#okButton").click(() => {
+                    $("#firstContinue").css("display","none")
+                    $("#LLForm").css("display", "none");
+                    $("#uploads").css("display", "block");
+                    $("#popup").css("display", "none");
+
+                    // Get Aadhar number from the LLForm section
+                    // const aadharNumber = $("#daadharNumber").val();
+
+                    // Set Aadhar number in the photoUpload section
+                    // $("#aadharNumber").val(aadharNumber);
+                });
+
+                
+
+
+              // for image upload
+                $("#btnUpload").click((e) =>{
+                    e.preventDefault();
+
+                    
+
+                    const aadharNumber = $("#uploadsAadharNumber").val();
+                    const signatureImage = $("#signatureImage")[0].files[0];
+
+                var formData = new FormData();
+                formData.append("aadharNumber", aadharNumber);
+                formData.append("signatureImage", signatureImage);
+
+                    $.ajax({
+                        method: "post",
+                        url: "http://127.0.0.1:4000/upload",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                success: function (response) {
+                    showNotification("Signature uploaded successfully!");
+                    $("#photoUpload").css("display", "block");
+                    $("#uploads").css("display", "none");
+                    $("#Uname").val("");
+                    $("#Uimage").val(null);  
+                    $("#LLForm").css("display","none");
+                    $("#signatureImage").val(null);
+                    
+                    
+                },
+                error: function (xhr, status, error) {
+                    // Handle error, e.g., display an error message
+                    alert("An error occurred while uploading the signature and photo: " + error);
+                    console.log(xhr.responseText);
+                }
+                    })
+                });
+          
+          //for captured photo 
+          
+            const openCamera = $('#openCamera');
+            const video = $('#video');
+            const canvas = $('#canvas');
+            const capture = $('#capture');
+            const retake = $('#retake');
+            const btnSave = $('#btnSave');
+            const errorMsgElement = $('#ErrorMsg');
+            const capturedImage = $('#capturedImage');
+
+            let capturedPhotoUrl = null;
+
+
+            const constraints = {
+                video: {
+                    width: 250, height: 300
+                }
+            };
+
+            async function init() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    handleSuccess(stream);
+                } catch (e) {
+                    errorMsgElement.html(`navigator.getUserMedia.error:${e.toString()}`);
+                }
+            }
+
+            function handleSuccess(stream) {
+                window.stream = stream;
+                video.prop('srcObject', stream);
+                $('.video-wrap').css('display', 'block');
+                $('.controller').css('display', 'block');
+            }
+
+            openCamera.on('click', function () {
+                init();
+            });
+
+            var context = canvas[0].getContext('2d');
+
+            function clearCanvas() {
+                context.clearRect(0, 0, canvas[0].width, canvas[0].height);
+            }
+
+            capture.on('click', function () {
+                context.drawImage(video[0], 0, 0, 250, 300);
+                capturedPhotoUrl = canvas[0].toDataURL('image/png');
+            });
+
+            retake.on('click', function () {
+                clearCanvas();
+                capturedPhotoUrl = null;
+                capturedImage.attr('src', '');
+            });
+
+    btnSave.on('click', function () {
+        const aadharNumber = $("#photoUploadAadharNumber").val();
+
+    if (capturedPhotoUrl) {
+        console.log('Captured Photo URL:', capturedPhotoUrl);
+
+        capturedImage.attr('src', capturedPhotoUrl);
+
+        // Convert Data URL to Blob
+        const blob = dataURLtoBlob(capturedPhotoUrl);
+
+        // Prepare the data for upload
+        const data = new FormData();
+        data.append('image', blob, 'image.png');
+        data.append('aadharNumber', aadharNumber);
+
+        $.ajax({
+            method: 'POST',
+            url: 'http://127.0.0.1:4000/capturedPhoto', // Change this URL to your server endpoint
+            data: data,
+            contentType: false, // Ensure this is set to false for FormData
+            processData: false, // Ensure this is set to false for FormData
+            success: function (response) {
+                // alert(response.message);
+                showNotification(response.message);
+                $("#paymentPopup").css("display", "block")
+                // setTimeout(function(){
+                //     window.location.href = "payment.html";
+                // }, 3000)
+                
+                
+            },
+            error: function (xhr, status, error) {
+                console.error('Error uploading image: ' + JSON.stringify(error));
+            }
+        });
+    }
+});
+    $("#paymentOkButton").click(()=>{
+        window.location.href = "payment.html"
+    })
+
+function dataURLtoBlob(dataURL) {
+    const parts = dataURL.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = atob(parts[1]);
+    const rawLength = raw.length;
+    const uint8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
+        uint8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uint8Array], { type: contentType });
+}
+
+
+                
+});
+
+                
+            
+
+            
+
+    </script>
+</body>
+</html>

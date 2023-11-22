@@ -1,0 +1,135 @@
+.preloader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Transparent background */
+    z-index: 1000; /* Ensures it's on top of everything */
+  }
+
+  .preloader img {
+    max-height: 200px;
+    max-width: 200px;
+  }
+
+  .preloader div {
+    font-size: 25px;
+    color: white;
+  }
+.projectTag{
+    background-color: #333A45;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 500;
+    color: #1797C1;
+    position: fixed;
+    width: 100%;
+    z-index: 10;
+    top: 0;
+    padding: 5px;
+    }
+nav{
+    height: auto;
+    background-color: #374151;
+    color: #D8DAE0;
+    position: fixed;
+    width: 100%;
+    top: 50px;
+    display: flex;
+    padding-top: 10px;
+    justify-content: space-between;
+}
+
+.logoutBtn{
+    color: #D8DAE0;
+    border: 1px double;
+    border-radius: 5px;
+    background-color: #374151;
+}
+
+.logoutBtn:hover{
+    background-color: #1797C1;
+}
+.main-content{
+    margin-top: 150px;
+    padding-left: 100px;
+}
+
+#checkResults{
+    color: #D8DAE0;
+    border: 1px double;
+    border-radius: 5px;
+    background-color: #1797C1;
+    width: 150px;
+}
+
+.notification-box {
+    position: fixed;
+    top: 150px;
+    right: 20px;
+    border-top: 4px solid #1797C1;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: none; /* Initially hidden */
+}
+
+.notification-message {
+    display: inline;
+}
+
+#openCamera,#capture,#retake,#btnSave,#btnDone{
+    background-color: #1797C1;
+    border-radius: 5px;
+    color: #F9FBFC;
+    width: 150px;
+}
+
+.photo{
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    top: 30%;
+    left: 40%;
+}
+#capture{
+    margin-left: 50px;
+}
+
+.popup{
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #374151;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    border: 1px solid rgb(65, 63, 63);
+}
+
+.popup-content{
+    text-align: center;
+}
+
+#okButton{
+    padding: 2px;
+    cursor: pointer;
+    width: 40px;
+    height: 30px;
+    background-color: #0D6D8C;
+    color: #FFFFFF;
+    border: 1px solid #149ECA;
+}
+
+.success{
+    color: green;
+    font-weight: 500;
+}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LL Form Update Page</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="../src/update-LL.css">
+</head>
+<body style="background-color: #19374C; color: white;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="name" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="title" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <h3>To view the LL form applied earlier please click on the view button below.</h3>
+        <p>Here some fields are disabled so you cannot edit them. (That are from Aadhar details.)</p>
+        <button class="form-control" id="btnView">View</button>
+
+        <div id="LLForm">
+            <div class="d-flex">
+            <div class="me-5">
+                <dd>Aadhar Number</dd>
+                <dt><input type="text" class="form-control w-100" id="LLaadharNumber"  required disabled></dt>
+            </div>
+            <div class="me-5">
+                <dd>Full Name</dd>
+                <dt><input type="text" class="form-control w-100" id="LLfullName" required disabled></dt>
+            </div>
+            <div class="me-5">    
+                <dd>Date of Birth</dd>
+                <dt><input type="text" class="form-control w-100" id="LLDOB" required disabled></dt>
+            </div>
+            </div>
+            <div class="d-flex mt-4">
+                <div class="me-5">
+                    <dd>Gender</dd>
+                    <dt><input type="text" class="form-control w-100" id="LLGender" required disabled></dt>
+                </div>
+                <div class="me-5">
+                    <dd>Phone Number</dd>
+                    <dt><input type="text" class="form-control w-100" id="LLPhone" required disabled></dt>
+                </div>
+                <div class="me-5">
+                    <dd>Email</dd>
+                    <dt><input type="text" class="form-control w-100" id="LLEmail" required disabled></dt>
+                </div>
+            </div>
+    
+            <div class="d-flex">
+                <div class="me-5 donor">
+                    <dd>Are you an organ donor?</dd>
+                    <dt>
+                        <input type="radio" class="form-check-input" name="LLdonor" id="donorYes" value="yes"> Yes
+                        <input type="radio" class="form-check-input" name="LLdonor" id="donorNo" value="no"> No
+                    </dt>
+                 </div>
+        <div class="me-5 organ">
+            <dd>Blood Group</dd>
+            <dt><input type="text" class="form-control" id="LLgroup" required></dt>
+        </div>
+    
+        <div class="me-5 vehicle">
+        <dd>For which Class of Vehicle you want LL?</dd>
+        <dt><input type="checkbox" class="form-check-input LLclassV" id="LLclassV" name="LLclassV" value="TWWOG"> Two wheeler without gear</dt>
+        <dt><input type="checkbox" class="form-check-input LLclassV" id="LLclassV" name="LLclassV" value="TWWG"> Two wheeler with gear</dt>
+        <dt><input type="checkbox" class="form-check-input LLclassV" id="LLclassV" name="LLclassV" value="FW"> Four wheeler</dt>
+        </div>
+    </div>
+    <dd>LL Reference Number</dd>
+            <dt><input type="text" id="LLLLreferenceNumber" required disabled></dt>
+            <p>If you want to update the details then edit the fields and click on update.</p>
+            <button class="form-control" id="btnUpdate">Update LL Form</button>
+        </div>
+
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <p class="success">LL form data updated successfully</p>
+            <button id="okButton">Ok</button>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener("load", function () {
+        setTimeout(function () {
+          document.querySelector(".preloader").style.display = "none";
+          document.body.style.display = "block";
+        }, 300); // 2000 milliseconds = 2 seconds
+      });
+
+        $(document).ready(function(){
+            let aadharNumber; 
+
+                if ($.cookie("aadhar_number") === undefined) {
+                    location.href = "main.html";
+                } else {
+                    aadharNumber = $.cookie("aadhar_number");
+                }
+                $("#btnLogout").click(() => {
+                    $.removeCookie("aadhar_number");
+                    location.href = "main.html";
+                });
+
+                $("#okButton").click(()=>{
+                    window.location.href = "index.html";
+                })
+                   
+            $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/aadharDetails",
+                success: (data)=>{
+                    const user = data.find(aadharData => aadharData.aadharNumber === aadharNumber);
+                    if(user){
+                        $("#name").text(user.fullName);
+                        $("#title").text(user.aadharNumber)
+                    };
+                }
+            });    
+
+            $("#btnView").click(function(){
+                $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/llFormData",
+                    success: (llFormData) =>{
+                    const user = llFormData.find(userData => userData.aadharNumber === aadharNumber);
+                    if(user){
+                        $('#LLaadharNumber').val(user.aadharNumber);
+                        $('#LLfullName').val(user.fullName);
+                        $('#LLDOB').val(user.dateOfBirth);
+                        $('#LLGender').val(user.gender);
+                        $('#LLPhone').val(user.phone);
+                        $('#LLEmail').val(user.email);
+                        if (user.organDonor.includes('yes')) {
+                            $('#donorYes').prop('checked', true);
+                        } else {
+                            $('#donorNo').prop('checked', true);
+                        }
+                        $('#LLgroup').val(user.bloodGroup);
+                        $('.LLclassV').each((index, element) => {
+                            if (user.classOfVehicle.includes($(element).val())) {
+                                $(element).prop('checked', true);
+                            }
+                        });
+
+                            $('#LLLLreferenceNumber').val(user.LLreferenceNumber);
+                        }
+                        },
+                    error: ()=>{
+                        alert("Error in fetching data!");
+                        }
+                })
+            });
+
+            $("#btnUpdate").click(function() {
+                var id = $("#LLaadharNumber").val();
+                // console.log(id);
+                var selectedVehicles = []; // To store the selected class of vehicles
+                        $("#classV:checked").each(function() {
+                            selectedVehicles.push($(this).val());
+                        });
+                    
+                    var donorValue = $("input[name='donor']:checked").val();
+                    if (!donorValue) {
+                        // If neither "Yes" nor "No" is selected, you can handle it here as needed.
+                        // For example, you can set it to "no" by default.
+                        donorValue = "no";
+                    }
+                const updatedUserData = {
+                    aadharNumber : $("#LLaadharNumber").val(),
+                    fullName: $('#LLfullName').val(),
+                    dateOfBirth: $('#LLDOB').val(),
+                    gender: $('#LLGender').val(),
+                    phone: $('#LLPhone').val(),
+                    email: $('#LLEmail').val(),
+                    organDonor: donorValue,
+                    bloodGroup: $('#LLgroup').val(),
+                    classOfVehicle: selectedVehicles,
+                    LLreferenceNumber: $('#LLLLreferenceNumber').val(),
+                };
+                $(".LLclassV:checked").each(function() {
+                    updatedUserData.classOfVehicle.push($(this).val());
+                });
+
+                $.ajax({
+                    method: "put",
+                    url: `http://127.0.0.1:4000/updateUserLLForm/${id}`,
+                    data: updatedUserData, // Send data as JSON
+                    success: function(data) {
+                       $("#popup").css("display", "block");
+                        },
+                })
+            })
+        })
+    </script>
+</body>
+</html>

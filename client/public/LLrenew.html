@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LL Renew</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <link rel="stylesheet" href="../src/llrenew.css">
+</head>
+<body style="background-color: #19374C; color: white;">
+    <div class="preloader">
+        <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+        <div>DL</div>
+      </div>
+    <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+    <nav class="d-flex">
+        <div>
+            <span>Hello! Dear User - <span id="fullName" style="font-weight: 500;"></span></span><br>
+            <span>Aadhar Number: <span id="aadharNumber" style="font-weight: 500;"></span></span>
+        </div>
+        <div>
+            <button class="logoutBtn mt-2"><span class="bi bi-power"> Log Out</span></button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <p>To Renew Your LL You have to pay money.</p>
+        <p>You have to pay 100/- for the LL renewal</p>
+
+        <div id="paymentForm">
+            <label for="paymentAmount">Payment Amount (INR):</label>
+            <!-- Display the user's total fee as the default payment amount and disable the input -->
+            <div class="d-flex">
+            <input type="number" class="form-control w-25" id="paymentAmount" min="1" step="0.01" disabled value="100">
+            <button class="form-control w-25 ms-2" id="llrenewinitiatePayment">Initiate Payment</button>
+            </div>
+        </div>
+
+        <div id="LLrenewReferenceNumber" style="display: none;">
+            <p>LL Payment Reference Number: <span id="refNumber"></span></p>
+            <p>Please keep this reference number safe for future use.</p>
+            <p>And you can download your new LL from the index page.</p>
+        </div>
+
+
+        <div class="popup" id="popup">
+            <div class="popup-content">
+                <p class="success">LL renwal has successfully completed. <br> Thank you.</p>
+                <button id="okButton">Ok</button>
+            </div>
+        </div>
+
+        <div id="notificationBox" class="notification-box">
+            <div id="notificationMessage" class="notification-message">
+                <!--side popup will display here-->
+            </div>
+        </div>
+
+
+
+        
+    </div>
+    
+    <script>
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+            document.querySelector(".preloader").style.display = "none";
+            document.body.style.display = "block";
+            }, 300); // 2000 milliseconds = 2 seconds
+        });
+
+        $(".logoutBtn").click(()=>{
+            $.removeCookie('aadhar_number');
+            window.location.href = "index.html"
+        })
+
+        $("#okButton").click(()=>{
+            $('#popup').hide();
+        })
+
+        $(document).ready(function(){
+            let aadharNumber = $.cookie("aadhar_number");
+            let toEmail;
+            let fullName;
+
+            if (aadharNumber === undefined) {
+                location.href = "index.html";
+            };
+
+            $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/aadhardetails",
+                success: function (data) {
+                    const user = data.find((userData) => userData.aadharNumber === aadharNumber);
+
+                    if (user) {
+                        toEmail = user.email; 
+                        fullName = user.fullName;
+                        // Display full name and Aadhar number on the page
+                        $("#fullName").text(user.fullName);
+                        $("#aadharNumber").text(user.aadharNumber);
+                    } else {
+                        alert("User data not found.");
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while fetching user data.");
+                }
+            });
+
+            function generateTodayDate() {
+                const today = new Date();
+                const day = today.getDate();
+                const month = today.getMonth() + 1; // Months are zero-based, so add 1
+                const year = today.getFullYear();
+                return `${year}/${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
+            }
+
+            function generateExpiryDate() {
+                const today = new Date();
+                const expiryDate = new Date(today);
+                expiryDate.setMonth(today.getMonth() + 6); // Expiration date 6 months from today
+                const day = expiryDate.getDate();
+                const month = expiryDate.getMonth() + 1;
+                const year = expiryDate.getFullYear();
+                return `${year}/${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
+            }
+
+            function generaterenewReferenceNUmber() {
+                // You can generate a random reference number or use any specific logic
+                // For simplicity, generating a random number here
+                const referenceNumber = Math.floor(Math.random() * 1000000); // Replace with your logic
+                return `LL${referenceNumber}`;
+            }
+
+            function showNotification(message){
+                const notificationBox = document.getElementById('notificationBox');
+                const notificationMessage = document.getElementById('notificationMessage');
+                notificationMessage.innerHTML = message;
+                notificationBox.style.display = 'block';
+                setTimeout(function() {
+                    notificationBox.style.display = 'none';
+                }, 5000);
+            }
+
+            $("#llrenewinitiatePayment").click(()=>{
+                const llrenewDate = generateTodayDate();
+                const llrenewExpiryDate = generateExpiryDate();
+                const renewReferenceNUmber = generaterenewReferenceNUmber();
+
+                llrenewdata = {
+                    aadharNumber: aadharNumber,
+                    amount : $('#paymentAmount').val(),
+                    renewReferenceNUmber : renewReferenceNUmber,
+                    llrenewDate: llrenewDate,
+                    LLexpiryDate : llrenewExpiryDate
+                }
+                $.ajax({
+                    method: "post",
+                    url: "http://127.0.0.1:4000/LLrenewDetails",
+                    data: llrenewdata,
+                    success: function (data) {
+                        $("#LLrenewReferenceNumber").show();
+                        $("#refNumber").text(renewReferenceNUmber);
+                        $("#popup").show();
+                        sendMailPaymentReferenceNumber(toEmail, fullName, llrenewDate, llrenewExpiryDate, renewReferenceNUmber)
+                    },
+                    error: function () {
+                        alert("Error occured");
+                    }
+                })
+            });
+
+            function sendMailPaymentReferenceNumber(toEmail, fullName, llrenewDate, llrenewExpiryDate, renewReferenceNUmber){
+                Email.send({
+                    SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3",
+                    To: toEmail,
+                    From: "ssati753@gmail.com",
+                    Subject: "Payment Reference Number",
+                    Body: `Dear User,${fullName}<br/>Congrats you have done your payment successfully.<br/>
+                    Your Payment Reference number is ${renewReferenceNUmber}. Please use this for any further assistance or queries.
+                    And you can download your new LL from index page.
+                    Your LL renewal date is ${llrenewDate},
+                    and expiry date is ${llrenewExpiryDate}.
+                    Thank you team DL`,
+                }).then(function (message){
+                    // alert("Email sent: " + message);
+                    showNotification("Payment Details has been sent to your mail.")
+                });
+
+            }
+
+        });    
+    </script>
+</body>
+</html>

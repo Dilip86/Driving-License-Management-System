@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="icons/icons8-driving-license-64.png">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/node_modules/jquery.cookie/jquery.cookie.js"></script>
+    <script src="https://kit.fontawesome.com/9e082aa5ef.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../src/admin-dashboard.css">
+</head>
+<body style="background-color: #19374C; color: white;">
+  <div class="preloader">
+      <img src="/client/public/icons/icons8-driving-license-64.png" alt="Your Logo" />
+      <div>DL</div>
+    </div>
+  <div class="projectTag">DRIVING LICENSE MANAGEMENT SYSTEM</div>
+  <nav class="head_nav d-flex">
+      <div>
+          <!-- <span>Hello! Dear Admin - <span id="adminName" style="font-weight: 500;"></span></span><br>
+          <span>Admin Id: <span id="adminId" style="font-weight: 500;"></span></span> -->
+          <h3>Admin Dashboard</h3>
+      </div>
+      <div>
+          <button class="logoutBtn mt-2" id="btnLogout"><span class="bi bi-power"> Log Out</span></button>
+      </div>
+  </nav>
+
+<div class="main-content d-grid">
+  <div class="side_nav" style="width: auto; height: 650px; background-color: #3C4B64;padding: 20px; overflow-y: auto;">
+    <div class="side_toggle d-flex" id="sideToggle">
+      <span class="bi bi-layout-text-sidebar-reverse"></span>
+      <span class="admin">Admin</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="dashboardTab">
+      <span class="bi bi-speedometer2"></span>
+      <span>Dashboard</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showUsers">
+      <span class="bi bi-people-fill"></span>
+      <span>Users</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showLLForm">
+      <span class="bi bi-journal-text"></span>
+      <span>LL Applications</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showUploads">
+      <span class="bi bi-pen-fill"></span>
+      <span>LL Signatures</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showCaptures">
+      <span class="bi bi-person-circle"></span>
+      <span>LL Photo</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showPayments">
+      <span class="bi bi-currency-rupee"></span>
+      <span>LL Payments</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showResponses">
+      <span class="bi bi-reply-all"></span>
+      <span>LL Responses</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showExamStatus">
+      <span class="fas fa-book-reader"></span>
+      <span>LL Exam Status</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showExamFailed">
+      <span class="fas fa-book-reader"></span>
+      <span>LL Exam Failed</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="showDLPayments">
+      <span class="bi bi-currency-rupee"></span>
+      <span>DL Payements</span>
+    </div>
+    <div class="d-flex dashboard_tab" id="ShowDLPaymentResponses">
+      <span class="bi bi-reply-all"></span>
+      <span>DL Responses</span>
+    </div>
+    
+
+    
+  </div>
+  
+  <div class="mainpage" style="width: auto; height: auto;">
+    <div>
+    <div class="salute">
+        <span id="salutation"></span><span id="adminName"></span>
+    </div>
+    <div class="home_content">
+    <div class="d-flex justify-content-around">
+      <div class="llp">
+        <div>
+          <h5>LL Pendings</h5>
+          <span class="mt-2">Count: <span class="fs-5 fw-bold" id="LLPcount"><!--fetch the data count from llfrom table and dispaly--></span></span>
+        </div>
+      </div>
+      <div class="llc">
+        <h5>LL Completed</h5>
+        <span class="mt-2">Count<span class="fs-5 fw-bold" id="LLCcount"><!--fetch the data count from examstatus table and dispaly--></span></span>
+      </div>
+      <div class="dlp">
+        <h5>DL Pendings</h5>
+        <span class="mt-2">Count<span class="fs-5 fw-bold" id="DLPcount"><!--fetch the data count from dlslotbookings table and dispaly--></span></span>
+      </div>
+      <div class="dlc">
+        <h5>DL Completed</h5>
+        <span class="mt-2">Count<span class="fs-5 fw-bold" id="DLCcount"><!--fetch the data count from dldetails table and dispaly--></span></span>
+      </div>
+
+      <!--calendear of uers slot booked for dl of specific date-->
+      <div class="slotCalendar">
+        <h5>Slot Bookings</h5>
+        <span>Count of Today: <span class="slotCount"></span></span>
+      </div>
+    </div>
+    <!--fetch the uses who has completed his llform payments -->
+    
+    <div class="m-5">
+      <h4>Latest applications of LL</h4>
+      <div class="fetchLLappliedUsers">
+        <table id="LLapplication">
+          <thead>
+            <tr>
+              <th>Aadhar Number</th>
+              <th>LL Reference No.</th>
+              <th>Payment Reference No.</th>
+              <th>Remark Verify or not</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!--fetch the users who has booked slot for DL-->
+    <div class="m-5">
+      <h4>Latest applications of DL</h4>
+      <div class="fetchDLappliedUsers">
+        <table id="dlSlotbookeduserstable">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Aadhar Number</th>
+              <th>DL Slot Reference Number</th>
+              <th>DL Fee Reference Number</th>
+              <th>DL Reference Number</th>
+              <th>Continue DL Process</th>
+            </tr>
+           </thead>
+           <tbody>
+        
+           </tbody> 
+        </table>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="usersData">
+      <table id="usersTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Aadhar Number</th>
+                <th>Password</th>
+                <th>Re Password</th>
+            </tr>
+        </thead>
+        <tbody>
+      
+        </tbody>
+      </table>
+    </div>
+
+    <table id="LLFormTable" style="display: none;">
+      <thead>
+          <tr>
+              <th>Aadhar Number</th>
+              <th>Full Name</th>
+              <th>Date of Birth</th>
+              <th>Gender</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Organ Donor</th>
+              <th>Blood Group</th>
+              <th>Class Of Vehicle</th>
+              <th>LL Reference Number</th>
+          </tr>
+      </thead>
+      <tbody>
+    
+      </tbody>
+    </table>
+
+    <table id="uploadsTable" style="display: none;">
+      <thead>
+          <tr>
+              <th>Aadhar Number</th>
+              <th>Signature</th>
+          </tr>
+      </thead>
+      <tbody>
+    
+      </tbody>
+    </table>
+
+    <table id="capturesTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>Aadhar Number</th>
+          <th>Captured Photo</th>
+        </tr>
+        </thead>
+        <tbody>
+    
+        </tbody>
+    </table>
+
+    <table id="paymentsTable"  style="display: none;">
+      <thead>
+        <tr>
+          <th>Aadhar Number</th>
+          <th>Total Fee</th>
+          <th>Class of Vehicle</th>
+          <th>Fee Reference Number</th>
+        </tr>
+        </thead>
+        <tbody>
+    
+        </tbody>
+    </table>
+
+    <div id="responses" style="display: none;">
+      <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRY9JowdA5IjKeSUPbcwTSltPsCVzdx4Ozy8YsORG3d6XZutxiGRdC6nVQMpB_vctFkaYhchs0N2QGO/pubhtml" style="width: 1000px; height: 200px;"></iframe>
+    </div>
+
+    <table id="examgivenusers" style="display: none;">
+      <thead>
+        <th>Aadhar Number</th>
+        <th>LL Reference Number</th>
+        <th>Exam Id</th>
+        <th>Unique LL Id</th>
+        <th>LL Created data</th>
+        <th>LL Expiry date</th>
+        </thead>
+        <tbody>
+    
+          </tbody>
+    </table>
+
+    <table id="examFailedUsers" style="display: none;">
+      <thead>
+        <th>Aadhar Number</th>
+        <th>LL Reference Number</th>
+        <th>Exam Id</th>
+        <th>Status</th>
+      </thead>
+      <tbody>
+    
+        </tbody>
+    </table>
+
+    <table id="DLpaymentsTable" style="display: none;">
+      <thead>
+        <th>Aadhar Number</th>
+        <th>Amount Paid</th>
+        <th>DL Fee Reference Id</th>
+        <th>DL Reference Number</th>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </table>
+    
+    <div id="dlPaymentResponses" style="display: none;">
+      <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTgeMLmtV_c1rewkV7l0n7gQy9PYHUxtzDa1VfTxZ_qqSMPu4v5IufF5EXIyJpR0jajw3N_vsx1bnzL/pubhtml?widget=true&amp;headers=false" style="width: 1000px; height: 200px;"></iframe>
+    </div>
+
+     </div>
+  </div>
+</div>
+
+      <div class="popup" id="popup">
+        <div class="popup-content">
+            <p class="success">User is verified and exam credentials stored in the database.</p>
+            <button id="okButton">Ok</button>
+        </div>
+      </div>
+
+      <div class="notv_popup" id="notv_popup">
+        <div class="notv_popup-content">
+            <p class="success">User is marked as not verified with the selected purpose and updated in the database.</p>
+            <button id="notvokButton">Ok</button>
+        </div>
+      </div>
+
+      <div id="notificationBox" class="notification-box">
+        <div id="notificationMessage" class="notification-message">
+            <!--side popup will display here-->
+        </div>
+      </div>
+
+ <script src="admin-dashboard.js"></script>
+ <script src="https://smtpjs.com/v3/smtp.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> <!-- Include Bootstrap JavaScript -->
+
+    <script>
+       window.addEventListener("load", function () {
+        function updateSalutation() {
+                const currentTime = new Date();
+                const currentHour = currentTime.getHours();
+
+                let salutationText = "";
+                if (currentHour >= 4 && currentHour < 12) {
+                    salutationText = `Good morning<span class="bi bi-sunrise"></span>`;
+                } else if (currentHour >= 12 && currentHour < 16) {
+                    salutationText = `Good Afternoon<span class="bi bi-sun-fill"></span>`;
+                } else {
+                    salutationText = `Good Evening<span class="bi bi-sunset"></span>`;
+                }
+
+                // Get the admin name (you may need to adjust this)
+
+                // Update the salutation element
+                $("#salutation").html(salutationText);
+            }
+
+            // Initial call to set the salutation
+            updateSalutation();
+
+            setTimeout(function () {
+            document.querySelector(".preloader").style.display = "none";
+            document.body.style.display = "block";
+            }, 300); // 2000 milliseconds = 2 seconds
+        });
+
+        
+
+      $(document).ready(function(){
+      
+        let adminId;
+
+        
+
+        if ($.cookie("admin_id") === undefined) {
+                    location.href = "index.html";
+                } else {
+                  adminId = $.cookie("admin_id");
+                  document.title = `Admin Dashboard (${adminId})`;
+                  $("#adminId").html(adminId);
+
+                  $.ajax({
+                    method: "get",
+                    url: "http://127.0.0.1:4000/adminData",
+                    success: (adminData) =>{
+                      const user = adminData.find(admins => admins.adminId === adminId);
+                      if(user){
+                        $("#adminName").text(user.adminName);
+                      }
+                    },
+                    error: ()=>{
+                      alert('Error in getting data');
+                    }
+                  })
+                }
+
+
+            $("#btnLogout").click(() => {
+                $.removeCookie("aadhar_number");
+                location.href = "index.html";
+            }); 
+
+            $("#okButton").click(()=>{
+              $("#popup").css("display","none")
+            })
+
+            $("#notvokButton").click(()=>{
+              $("#notv_popup").css("display","none")
+            })
+            
+              
+            //for hiding the table if another table is loaded
+            function hideOtherTables(expectTableId){
+              const tableIds = ["aadharTable", "usersTable","DLpaymentsTable","examgivenusers","examFailedUsers","dlPaymentResponses", "LLFormTable", "uploadsTable", "capturesTable", "paymentsTable", "responses","dashboardTab", "home_content"];
+              tableIds.forEach(tableId =>{
+                if(tableId !== expectTableId){
+                  $(`#${tableId}`).hide();
+                }
+              })
+            }
+            
+            //main table data
+
+            $("#showMain").click(()=>{
+              hideOtherTables("aadharTable");
+              hideHomeContent();
+              $("#aadharTable").toggle();
+              $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/aadharDetails",
+                success: (data)=>{
+                  const aadharTable = $("#aadharTable tbody");
+                  aadharTable.empty();
+
+                  data.forEach((entry)=>{
+                    const address = `${entry.address.street}, ${entry.address.city}, 
+                    ${entry.address.state}, ${entry.address.postalCode}`;
+                    const row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                        <td>${entry.fullName}</td>
+                        <td>${entry.dateOfBirth}</td>
+                        <td>${entry.gender}</td>
+                        <td>${address}</td>
+                        <td>${entry.phone}</td>
+                        <td>${entry.email}</td>
+                      </tr>`;
+                      aadharTable.append(row);
+                  });
+                },
+                error: ()=>{
+                  alert('error fetching data');
+                }
+              })
+            });
+
+            // users table
+            $("#showUsers").click(()=>{
+              hideOtherTables("usersTable");
+              hideHomeContent();
+              $("#usersTable").toggle();
+              $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/users",
+                success: (data)=>{
+                  const usersTable = $("#usersTable tbody");
+                  usersTable.empty();
+
+                  data.forEach((entry)=>{
+                    const row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                        <td>${entry.password}</td>
+                        <td>${entry.repassword}</td>
+                      </tr>`;
+                      usersTable.append(row);
+                  });
+                },
+                error: ()=>{
+                  alert('error fetching data');
+                }
+              })
+            });
+
+            //LL form fetching query
+            $("#showLLForm").click(()=>{
+              hideOtherTables("LLFormTable");
+              hideHomeContent();
+              $("#LLFormTable").toggle();
+              $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/llFormData",
+                success: (data)=>{
+                  const LLFormTable = $("#LLFormTable tbody");
+                  LLFormTable.empty();
+
+                  data.forEach((entry)=>{
+                    const organDonor = entry.organDonor ? "yes" : "no";
+                    const classOfVehicle = Array.isArray(entry.classOfVehicle) ? entry.classOfVehicle.join(', ') : "";                   
+                      const row = `<tr>
+                        <td>${entry.aadharNumber}</td>
+                        <td>${entry.fullName}</td>
+                        <td>${entry.dateOfBirth}</td>
+                        <td>${entry.gender}</td>
+                        <td>${entry.phone}</td>
+                        <td>${entry.email}</td>
+                        <td>${organDonor}</td>
+                        <td>${entry.bloodGroup}</td>
+                        <td>${classOfVehicle}</td>
+                        <td>${entry.LLreferenceNumber}</td>
+                      </tr>`;
+                      LLFormTable.append(row);
+                  });
+                },
+                error: ()=>{
+                  alert('error fetching data');
+                }
+              })
+            });
+            
+
+            //uploads table data
+            $("#showUploads").click(()=>{
+              hideOtherTables("uploadsTable");
+              hideHomeContent();
+              $("#uploadsTable").toggle();
+              $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/uploads",
+                success: (data)=>{
+                  const uploadsTable = $("#uploadsTable tbody");
+                  uploadsTable.empty();
+
+                  data.forEach((entry)=>{
+                    const imgSrc = `data:image/png;base64,${entry.signature}`;
+                    const row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                        <td><img src="${imgSrc}" alt="Signature" style="height:50px; width:100px;"></td>
+                      </tr>`;
+                      uploadsTable.append(row);
+                  });
+                },
+                error: ()=>{
+                  alert('error fetching data');
+                }
+              })
+            });
+
+            // captures table
+
+            $("#showCaptures").click(()=>{
+              hideOtherTables("capturesTable");
+              hideHomeContent();
+              $("#capturesTable").toggle();
+              $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/capturedPhoto",
+                success: (data)=>{
+                  const capturesTable = $("#capturesTable tbody");
+                  capturesTable.empty();
+
+                  data.forEach((entry)=>{
+                    const imgSrc = `data:image/png;base64,${entry.image}`;
+                    const row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                        <td><img src="${imgSrc}" alt="captured photo" style="height:150px; width:200px;"></td>
+                      </tr>`;
+                      capturesTable.append(row);
+                  });
+                },
+                error: ()=>{
+                  alert('error fetching data');
+                }
+              })
+            });
+
+            // payments 
+            $("#showPayments").click(()=>{
+              hideOtherTables("paymentsTable");
+              hideHomeContent();
+              $("#paymentsTable").toggle();
+              $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/LLfeeData",
+                success: (data)=>{
+                  const paymentsTable = $("#paymentsTable tbody");
+                  paymentsTable.empty();
+
+                  data.forEach((entry)=>{
+                    
+                    const row = `<tr>
+                        <td>${entry.aadharNumber}</td>
+                        <td>${entry.totalFee}</td>
+                        <td>${entry.classOfVehicle.join(', ')}</td>
+                        <td>${entry.paymentReferenceNumber}</td>
+                      </tr>`;
+                      paymentsTable.append(row);
+                  });
+                },
+                error: (error)=>{
+                  alert('error fetching data' + error.statusText);
+                }
+              })
+            });
+
+            //response data
+            $("#showResponses").click(() => {
+              hideOtherTables("responses");
+              hideHomeContent();
+              $("#responses").toggle();
+
+            });
+  
+            // fetching the details from two collections and displaying in to the table the table
+            // $("#btnFetch").click(()=>{
+              $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/fetchCombinedData",
+                success: (data)=>{
+                  let table = $("#LLapplication tbody");
+                  table.empty();
+                  data.forEach((entry) => {
+                    let row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                      <td>${entry.LLreferenceNumber}</td>
+                      <td>${entry.combinedData[0].paymentReferenceNumber}</td>
+                      <td><button id="btnVerify" class="verify-button"  data-aadhar-number="${entry.aadharNumber}">
+                        <span class="bii bi-card-checklist"></span> Verify</button> 
+                          <button class="not-verify-button bg-danger" data-aadhar-number="${entry.aadharNumber}">
+                          <span class="bii bi-x-square-fill"></span> Not Verify</button>
+                          <select class="not-verify-purpose">
+                          <option value="">Select Purpose</option>
+                          <option value="Incorrect Data">Incorrect Data in LL form</option>
+                          <option value="SignatureIssue">Signature Issue</option>
+                          <option value="CapturePhoto">Capture Photo Issue</option>
+                        </select>
+                          </td>
+                      </tr>`;
+                      table.append(row);
+                  })
+                }
+              })
+            // });
+
+            $("#showExamStatus").click(()=>{
+              hideOtherTables("showExamStatus");
+              hideHomeContent();
+              $("#examgivenusers").toggle();
+              $.ajax({
+                method: "GET",
+                url: "http://127.0.0.1:4000/examStatus",
+                success: (data)=>{
+                  let table = $("#examgivenusers tbody");
+                  table.empty();
+                  data.forEach((entry) => {
+                    let row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                      <td>${entry.LLreferenceNumber}</td>
+                      <td>${entry.examId}</td>
+                      <td>${entry.uniqueLLID}</td>
+                      <td><span class="bg-success-subtle">${entry.formattedDate}</span></td>
+                      <td><span class="bg-danger-subtle">${entry.expiryDate}</span></td>`;
+                      table.append(row);
+                    })
+                  }
+            })
+          });
+
+          $("#showExamFailed").click(()=>{
+            hideOtherTables("showExamFailed");
+            hideHomeContent();
+            $("#examFailedUsers").toggle();
+              $.ajax({
+                method: "GET",
+                url: "http://127.0.0.1:4000/failedUserDetails",
+                success: (data)=>{
+                  let table = $("#examFailedUsers tbody");
+                  table.empty();
+                  data.forEach((entry) => {
+                    let row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                      <td>${entry.LLreferenceNumber}</td>
+                      <td>${entry.examId}</td>
+                      <td><span class="bg-danger fs-3">${entry.examStatus}</span></td>`;
+                      table.append(row);
+                    })
+                  }
+            })
+          })
+
+          $("#showDLPayments").click(()=>{
+            hideOtherTables("showDLPayments");
+            hideHomeContent();
+            $("#DLpaymentsTable").toggle();
+              $.ajax({
+                method: "GET",
+                url: "http://127.0.0.1:4000/DLpaymentData",
+                success: (data)=>{
+                  let table = $("#DLpaymentsTable tbody");
+                  table.empty();
+                  data.forEach((entry) => {
+                    let row = `<tr>
+                      <td>${entry.aadharNumber}</td>
+                      <td>${entry.amountPaid}</td>
+                      <td>${entry.DLFeeReferenceId}</td>
+                      <td>${entry.DLreferenceNumber}</td>`;
+                      table.append(row);
+                    })
+                  }
+            })
+          });
+
+          $("#ShowDLPaymentResponses").on("click", function(){
+            hideOtherTables("ShowDLPaymentResponses")
+              $("#dlPaymentResponses").toggle();
+          });
+
+          $("#dashboardTab").on("click", function(){
+            hideOtherTables("dashboardTab")
+              $(".home_content").toggle();
+          });
+
+          function hideHomeContent() {
+            $("#home_content").hide();
+          }
+
+            function sendExamNotification(toEmail, fullName, LLreferenceNumber, aadharNumber, examId, examPassword) {
+            Email.send({
+                SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3", // Replace with your secure token
+                To: toEmail,
+                From: 'ssati753@gmail.com', // Update with your email address
+                Subject: "Congratulations! Your LL Application is Verified",
+                Body: `Congratulations! Dear ${fullName}. Your LL application is verified for LL Exam.
+                    Your credentials for the exam are below:
+                    Aadhar Number: ${aadharNumber},
+                    LL Reference Number: ${LLreferenceNumber},
+                    Exam ID: ${examId},
+                    Exam Password: ${examPassword}.
+                    Please note down these details carefully as they will be required at the time of examination.
+                    Thank you.
+                    Regards,
+
+                    Exam Guideline:
+                    You can go to your Main page and select the exam section.
+                    First, enter your LL Reference Number; if it matches, it will take you to the exam page.
+                    Enter the exam credentials to continue your exam.
+                    Best of luck for your exam!`,
+            }).then(function(message){
+              showNotification("Email sent to user regarding application verified.")
+            });
+        }           
+
+                  
+
+        // Function to verify a user
+        function verifyUser(aadharNumber, LLreferenceNumber, row) {
+            const examId = generateExamId();
+            const examPassword = generateExamPassword();
+
+            // Fetch the user's email based on aadharNumber from your data
+            $.ajax({
+                method: "get",
+                url: "http://127.0.0.1:4000/llFormData",
+                success: function (data) {
+                    const user = data.find((entry) => entry.aadharNumber === aadharNumber);
+                    if (user) {
+                        // Send email notification
+                        sendExamNotification(user.email, user.fullName, user.LLreferenceNumber, aadharNumber, examId, examPassword);
+                        // Update the verification status in the database
+                        const verifiedUsers = {
+                            aadharNumber: aadharNumber,
+                            LLreferenceNumber: user.LLreferenceNumber,
+                            Verified: true,
+                            examId: examId,
+                            examPassword: examPassword,
+                        };
+
+                        $.ajax({
+                            method: "post",
+                            url: "http://127.0.0.1:4000/examCredentials",
+                            data: verifiedUsers,
+                            success: function () {
+                              $("#popup").css("display","block");
+                                // alert("User is verified and exam credentials stored in the database.");
+                                // Update the row to indicate it's verified (you can add a CSS class to style it).
+                                row.addClass("verified");
+                            },
+                            error: function (err) {
+                                console.log(err);
+                            },
+                        });
+                    } else {
+                        alert("User not found.");
+                    }
+                },
+            });
+        }
+
+        
+
+        // Function to generate an exam ID
+        function generateExamId() {
+            // Generate a six-digit unique ID (only numbers)
+            return String(Math.floor(100000 + Math.random() * 900000));
+        }
+
+        // Function to generate an exam password
+        function generateExamPassword() {
+            // Generate a six-digit password combination of alphabet and numbers
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let password = '';
+            for (let i = 0; i < 6; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+
+        // Add an event listener for the Verify button
+        $(document).on("click", ".verify-button", function () {
+            const row = $(this).closest("tr");
+            const aadharNumber = row.find("td:eq(0)").text();
+            const LLreferenceNumber = row.find("td:eq(2)").text();
+            verifyUser(aadharNumber, LLreferenceNumber, row);
+
+            $(this).prop("disabled", true);
+            
+            $.ajax({
+              method: "DELETE",
+              url: `http://127.0.0.1:4000/examNotVerifiedUsers/${aadharNumber}/${LLreferenceNumber}`,
+              success: function () {
+                  // User's data is deleted, proceed with verification
+                  row.addClass("verified-row");
+                  verifyUser(aadharNumber, LLreferenceNumber, row);
+              },
+              error: function (err) {
+                  console.log(err);
+              },
+          });
+        });
+
+        // Add an event listener for the Not Verify button
+        $(document).on("click", ".not-verify-button", function () {
+            const row = $(this).closest("tr");
+            const aadharNumber = row.find("td:eq(0)").text();
+            const LLreferenceNumber = row.find("td:eq(2)").text();
+            const purpose = row.find(".not-verify-purpose").val();
+
+            if (!purpose){
+              alert('Please select a purpose for not verification.');
+              return;
+            }
+            notVerifyUser(aadharNumber, LLreferenceNumber, purpose);
+        });
+
+        function notVerifyUser(aadharNumber, LLreferenceNumber, purpose) {
+          $.ajax({
+            method: "get",
+            url: "http://127.0.0.1:4000/llFormData",
+            success: function(data){
+              const user = data.find((entry) => entry.aadharNumber === aadharNumber);
+              if(user){
+                sendNotVerifiedNotification(user.email, user.fullName, purpose);
+
+                const notVerifiedUsers = {
+                aadharNumber: aadharNumber,
+                LLreferenceNumber: LLreferenceNumber,
+                Verified: false,
+                purpose: purpose, // Save the selected purpose
+              };
+
+              $.ajax({
+                method: "post",
+                url: "http://127.0.0.1:4000/examNotVerifiedUsers",
+                data: notVerifiedUsers,
+                success: function(){
+                  // alert("User is marked as not verified with the selected purpose and updated in the database.");
+                  $("#notv_popup").css("display","block");
+                },
+                error: function(err){
+                  console.log(err);
+                }
+              });
+
+              } else{
+                alert('No User Found');
+              }
+            }
+          })
+        }
+
+        function showNotification(message){
+            const notificationBox = document.getElementById('notificationBox');
+            const notificationMessage = document.getElementById('notificationMessage');
+            notificationMessage.innerHTML = message;
+            notificationBox.style.display = 'block';
+            setTimeout(function() {
+                notificationBox.style.display = 'none';
+            }, 5000);
+        }
+            
+        function sendNotVerifiedNotification(toEmail, fullName, purpose) {
+          // Customize the email content based on the selected purpose
+          let subject = "";
+          let body = "";
+          if (purpose === "CapturePhoto") {
+            subject = "Issue with Captured Photo";
+            body = `Dear ${fullName}, your LL application is not verified due to an issue with the captured photo. Please review and resubmit the photo.`;
+          } else if (purpose === "SignatureIssue") {
+            subject = "Issue with Signature";
+            body = `Dear ${fullName}, your LL application is not verified due to an issue with the signature. Please review and resubmit your signature.`;
+          } else if (purpose === "Incorrect Data") {
+            subject = "LL application details";
+            body = `Dear ${fullName}, your LL application is not verified due to a incorrect details in LL form. Please review and rectify the LL Form.`;
+          }
+
+        // Send the email
+        Email.send({
+          SecureToken: "81ae4c19-1994-4777-9e94-935f03bd7fe3", // Replace with your secure token
+          To: toEmail,
+          From: 'ssati753@gmail.com', // Update with your email address
+          Subject: subject,
+          Body: body,
+        }).then(function (message){
+          showNotification("Email sent to user regarding Not verification.")
+        });
+      }     
+             
+   
+  $("#fetchVerifiedUsers").click(() => {
+  // Make an AJAX request to fetch the data
+  $.ajax({
+    method: "get",
+    url: "http://127.0.0.1:4000/examCredentials",
+    success: (data) => {
+      // Filter the data to include only entries with Verified status set to true
+      
+      // Populate the verifiedUserTable with the filtered data
+      const verifiedUserTable = $("#verifiedUserTable tbody");
+      verifiedUserTable.empty();
+
+      data.forEach((entry) => {
+        const row = `<tr>
+          <td>${entry.aadharNumber}</td>
+          <td>${entry.LLreferenceNumber}</td>
+          <td><span class="bi bi-patch-check-fill bg-success-subtle">Verified</span></td>
+          <td>${entry.examId}</td>
+          <td>${entry.examPassword}</td>
+        </tr>`;
+        verifiedUserTable.append(row);
+      });
+    },
+    error: () => {
+      alert('Error fetching verified users data');
+    }
+  });
+});
+
+    
+              $("#fetchNotVerifiedUsers").click(() => {
+                // Make an AJAX request to fetch the data
+                $.ajax({
+                  method: "get",
+                  url: "http://127.0.0.1:4000/examNotVerifiedUsers",
+                  success: (data) => {
+                    // Filter the data to include only entries with Verified status set to true
+                    
+                    // Populate the verifiedUserTable with the filtered data
+                    const unverifiedUserTable = $("#unverifiedUserTable tbody");
+                    unverifiedUserTable.empty();
+
+                    data.forEach((entry) => {
+                      const row = `<tr>
+                        <td>${entry.aadharNumber}</td>
+                        <td>${entry.LLreferenceNumber}</td>
+                        <td><span class="bi bi-x-circle-fill bg-danger-subtle"> Not Verified</span></td>
+                        <td>${entry.purpose}</td>
+                      </tr>`;
+                      unverifiedUserTable.append(row);
+                    });
+                  },
+                  error: () => {
+                    alert('Error fetching verified users data');
+                  }
+                });
+              });
+
+              // $("#btnDlSlotBookings").click(()=>{
+                $.ajax({
+                  method: "get",
+                  url: "http://127.0.0.1:4000/fetchDLslotANDdlFeeDetails",
+                  success: function(data){
+                    console.log("Data received from server : ", data);
+                    const dlSlotbookeduserstable = $("#dlSlotbookeduserstable tbody");
+                    dlSlotbookeduserstable.empty();
+                    data.forEach((entry)=>{
+                      const row = `<tr>
+                        <td>${entry.fullName}</td>
+                        <td>${entry.aadharNumber}</td>
+                        <td>${entry.DLSlotReferenceNumber}</td>
+                        <td>${entry.combinedData[0].DLFeeReferenceId}</td>
+                        <td>${entry.combinedData[0].DLreferenceNumber}</td>
+                        <td><button class="btn-view-dl-process form-control w-75" data-aadhar-number="${entry.aadharNumber}">DL process</button></td>
+                        </tr>`;
+                        dlSlotbookeduserstable.append(row);
+                      })   
+                  }
+                })
+              // });
+
+              $(document).on("click", ".btn-view-dl-process", function(){
+                const aadharNumber = $(this).data("aadhar-number");
+                sessionStorage.setItem("aadharNumber", aadharNumber)
+
+                window.location.href = "DL-Process.html";
+              });
+            
+                 
+      });
+    </script>
+</body>
+</html>
